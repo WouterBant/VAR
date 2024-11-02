@@ -15,6 +15,11 @@ Set debugging mode with:
 set DEBUG=[0,1,2,3,4,...]
 ```
 
+Code formatter / linter:
+```
+ruff format .
+```
+
 ## Lab 1: Line Following
 Build with:
 ```bash

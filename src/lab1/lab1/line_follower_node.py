@@ -12,24 +12,24 @@ import os
 
 class LineFollowerNode(Node):
     def __init__(self):
-        super().__init__('line_following_node')
-        
-        # Initialize your LineFollower class
-        debug_mode = int(os.getenv('DEBUG', '0'))
-        self.line_follower = LineFollower(debug=debug_mode)
-        
-        # Create publisher for robot movement
-        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        super().__init__("line_following_node")
 
-        self.timer = self.create_timer(3.0, self.timer_callback)  # 1 Hz frequency comment out later
-        
+        # Initialize your LineFollower class
+        debug_mode = int(os.getenv("DEBUG", "0"))
+        self.line_follower = LineFollower(debug=debug_mode)
+
+        # Create publisher for robot movement
+        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
+
+        self.timer = self.create_timer(
+            3.0, self.timer_callback
+        )  # 1 Hz frequency comment out later
+
         # Subscribe to camera image
         self.image_sub = self.create_subscription(
-            Image,
-            '/rae/stereo_front/image_raw',
-            self.image_callback,
-            10)
-            
+            Image, "/rae/stereo_front/image_raw", self.image_callback, 10
+        )
+
         self.bridge = CvBridge()
 
     def timer_callback(self):
@@ -40,7 +40,7 @@ class LineFollowerNode(Node):
 
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
-        
+
         # Create and publish Twist message
         twist_msg = Twist()
         twist_msg.linear.x = linear_vel  # Forward/backward
@@ -49,17 +49,17 @@ class LineFollowerNode(Node):
         twist_msg.angular.x = 0.0
         twist_msg.angular.y = 0.0
         twist_msg.angular.z = angular_vel  # Rotation angle per second
-        
+
         self.cmd_vel_pub.publish(twist_msg)
-        
+
     def image_callback(self, msg):
         # Convert ROS Image message to OpenCV image
-        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         cv_image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
 
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
-        
+
         # Create and publish Twist message
         twist_msg = Twist()
         twist_msg.linear.x = linear_vel  # Forward/backward
@@ -68,9 +68,9 @@ class LineFollowerNode(Node):
         twist_msg.angular.x = 0.0
         twist_msg.angular.y = 0.0
         twist_msg.angular.z = angular_vel  # Rotation angle per second
-        
+
         self.cmd_vel_pub.publish(twist_msg)
-    
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -79,5 +79,6 @@ def main(args=None):
     node.destroy_node()
     rclpy.shutdown()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
