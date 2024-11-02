@@ -20,3 +20,6 @@ Build with:
 ```bash
 colcon build --packages-select lab1
 ```
+
+# Lab2:
+Note: ros2 pkg create --build-type ament_python --node-name my_node lab2 in the src folder
