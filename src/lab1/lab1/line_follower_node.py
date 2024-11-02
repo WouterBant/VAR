@@ -4,19 +4,19 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
-from lab1.line_follower import LineFollowing
+from lab1.line_follower import LineFollower
 import numpy as np
 import cv2
 import os
 
 
-class LineFollowingNode(Node):
-    def __init__(self, debug=0):
+class LineFollowerNode(Node):
+    def __init__(self):
         super().__init__('line_following_node')
         
-        # Initialize your LineFollowing class
+        # Initialize your LineFollower class
         debug_mode = int(os.getenv('DEBUG', '0'))
-        self.line_follower = LineFollowing(debug=debug_mode)
+        self.line_follower = LineFollower(debug=debug_mode)
         
         # Create publisher for robot movement
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
@@ -74,7 +74,7 @@ class LineFollowingNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = LineFollowingNode()
+    node = LineFollowerNode()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

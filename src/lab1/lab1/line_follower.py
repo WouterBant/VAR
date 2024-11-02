@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class LineFollowing:
+class LineFollower:
+
     def __init__(self, debug=0):
         self.debug = debug
         self.params = {
