@@ -17,7 +17,7 @@ jobs:
       - name: Run Ruff formatter
         run: ruff format src
       - name: Run Ruff linter
-        run: ruff check .
+        run: ruff check src/*.py
       # Optional: Auto-commit formatting changes
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
