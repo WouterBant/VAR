@@ -8,6 +8,7 @@ from lab1.line_follower import LineFollower
 import numpy as np
 import cv2
 import os
+import yaml
 
 
 class LineFollowerNode(Node):
@@ -15,8 +16,17 @@ class LineFollowerNode(Node):
         super().__init__("line_following_node")
 
         # Initialize LineFollower class
-        debug_mode = int(os.getenv("DEBUG", "0"))
-        self.line_follower = LineFollower(debug=debug_mode)
+        config_path = os.path.join(
+            os.path.dirname(__file__),
+            "..", "..", "..", "..", "..",
+            "configs",
+            "lab1",
+            "line_follower_config.yaml",
+        )
+        with open(config_path, "r") as file:
+            self.config = yaml.safe_load(file)
+
+        self.line_follower = LineFollower(config=self.config)
 
         # Create publisher for robot movement
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)

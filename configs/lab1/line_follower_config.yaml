@@ -1,0 +1,17 @@
+line_detection_method: "None"  # Options: "canny", "sobel", "None"
+enhance_vertical_edges: true
+blur_image: true
+dilate_image: true
+smooth_angle: true
+filter_low_angle: 75
+filter_high_angle: 105
+binary_threshold: 240
+canny_lower: 100
+canny_upper: 150
+initial_linear_speed: 0.1
+initial_angular_speed: 0.0
+sobel_threshold: 50
+hough_threshold: 30
+hough_min_line_length: 40
+hough_max_line_gap: 50
+debug: 4
