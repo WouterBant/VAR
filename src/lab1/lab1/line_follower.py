@@ -34,6 +34,15 @@ class LineFollower:
             self.display_image("Cropped Image", cropped_img)
         return cropped_img
 
+    def crop_sides(self, img, roi_width_ratio=0.8):
+        height, width = img.shape[:2]
+        cropped_img = img[
+            :, int(width * (1 - roi_width_ratio)) : int(width * roi_width_ratio)
+        ]
+        if self.debug > 3:
+            self.display_image("Cropped Image", cropped_img)
+        return cropped_img
+
     def convert_to_gray(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         return gray
@@ -59,6 +68,18 @@ class LineFollower:
             self.display_image("dilated Image", img)
         return img
 
+    def sobel_edge_detection(self, img):
+        sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
+        sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
+        gradient_magnitude = np.sqrt(sobelx**2 + sobely**2)
+        gradient_magnitude = np.uint8(
+            gradient_magnitude * 255 / np.max(gradient_magnitude)
+        )
+        edges = cv2.threshold(gradient_magnitude, 50, 255, cv2.THRESH_BINARY)[1]
+        if self.debug > 3:
+            self.display_image("Sobel Edges", edges)
+        return edges
+
     def canny_edge_detection(self, img):
         edges = cv2.Canny(
             img, self.get_parameters("canny_lower"), self.get_parameters("canny_upper")
@@ -66,6 +87,14 @@ class LineFollower:
         if self.debug > 3:
             self.display_image("Edges Image", edges)
         return edges
+
+    def enhance_vertical_edges(self, img):
+        kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+        enhanced = cv2.filter2D(img, -1, kernel)
+        enhanced = np.absolute(enhanced)
+        if self.debug > 3:
+            self.display_image("Enhanced Vertical Edges", enhanced)
+        return enhanced
 
     def hough_transform(self, img):
         lines = cv2.HoughLinesP(
@@ -155,6 +184,7 @@ class LineFollower:
 
         # crop image to roi to avoid having to deal with unimportant lines
         img = self.crop_to_top_roi(img)
+        img = self.crop_sides(img)
         img_cropped = img.copy()
 
         # binarize
@@ -166,7 +196,9 @@ class LineFollower:
         img = self.dilate_image(img)
 
         # edge detection
-        edges = self.canny_edge_detection(img)
+        # edges = self.canny_edge_detection(img)
+        edges = self.enhance_vertical_edges(img)
+        edges = self.sobel_edge_detection(edges)
 
         # hough transform
         lines = self.hough_transform(edges)
