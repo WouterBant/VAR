@@ -14,7 +14,7 @@ class LineFollowerNode(Node):
     def __init__(self):
         super().__init__("line_following_node")
 
-        # Initialize your LineFollower class
+        # Initialize LineFollower class
         debug_mode = int(os.getenv("DEBUG", "0"))
         self.line_follower = LineFollower(debug=debug_mode)
 
@@ -33,10 +33,9 @@ class LineFollowerNode(Node):
         self.bridge = CvBridge()
 
     def timer_callback(self):
-        # cv_image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
         cv_image = cv2.imread("assets/classroom.png")
         # horizontally flip image
-        cv_image = cv2.flip(cv_image, 1)
+        # cv_image = cv2.flip(cv_image, 1)
 
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
