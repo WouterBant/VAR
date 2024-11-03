@@ -18,7 +18,11 @@ class LineFollowerNode(Node):
         # Initialize LineFollower class
         config_path = os.path.join(
             os.path.dirname(__file__),
-            "..", "..", "..", "..", "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
             "configs",
             "lab1",
             "line_follower_config.yaml",
