@@ -151,7 +151,9 @@ class LineFollower:
                 print(f"Turning {direction} with: {abs(line_angle)} rad/s")
 
             if self.config.get("smooth_angle"):
-                new_ang = 0.5 * (line_angle + cur_ang)
+                lmbda = self.config.get("smooth_lambda")
+                new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
+                
             action = (cur_lin, new_ang)
             self.movement["angular_speed"] = action[1]
 
