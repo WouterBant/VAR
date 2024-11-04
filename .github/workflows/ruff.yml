@@ -18,8 +18,3 @@ jobs:
         run: ruff format src
       - name: Run Ruff linter
         run: ruff check src/**/*.py
-      # Optional: Auto-commit formatting changes
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "style: format code with ruff"
-          file_pattern: "*.py"
