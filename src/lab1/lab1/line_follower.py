@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 
 class LineFollower:
@@ -10,9 +11,38 @@ class LineFollower:
             "linear_speed": self.config.get("initial_linear_speed"),
             "angular_speed": self.config.get("initial_angular_speed"),
         }
+        self.frame = 0
 
+    def undistort_image(self, image, camera_matrix, dist_coeffs):
+        h, w = image.shape[:2]
+        
+        # Generate new camera matrix
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(
+            camera_matrix, 
+            dist_coeffs, 
+            (w,h), 
+            1, 
+            (w,h)
+        )
+        
+        undistorted = cv2.undistort(
+            image, 
+            camera_matrix, 
+            dist_coeffs, 
+            None, 
+            newcameramtx
+        )
+        x, y, w, h = roi
+        undistorted = undistorted[y:y+h, x:x+w]
+        
+        if self.config.get("debug") > 3:
+            self.display_image("Undistorted Image", undistorted)
+        return undistorted
+    
     def convert_to_cv2_image(self, img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if self.config.get("debug") > 3:
+            self.display_image("Input Image", img)
         return img
 
     def crop_to_bottom_roi(self, img, roi_height_ratio=0.3):
@@ -105,21 +135,29 @@ class LineFollower:
         )
         return lines
 
-    def get_best_line(self, lines):
+    def get_best_line(self, lines, width):
         # alternatively, we can score all of them and choose the best one
         best_line = None
-        max_length = 0
+        best_loss = float("inf")
         for line in lines:
             x1, y1, x2, y2 = line[0]
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             angle = abs(np.degrees(np.arctan2(y2 - y1, x2 - x1)))
+            x = x1 if y1 < y2 else x2
+            distance_to_center = abs(x - width / 2)
+            if self.config.get("loss") == "distance":
+                loss = distance_to_center
+            elif self.config.get("loss") == "length":
+                loss = -length
+            else:
+                raise ValueError("Invalid loss function")
             if (
                 self.config.get("filter_low_angle")
                 <= angle
                 <= self.config.get("filter_high_angle")
-                and length > max_length
+                and loss < best_loss
             ):
-                max_length = length
+                best_loss = loss
                 best_line = line
                 if self.config.get("debug") > 1:
                     print(f"Found line with length {length} and angle {angle}")
@@ -180,10 +218,37 @@ class LineFollower:
                 )  # Draw green lines
 
         return line_image
+    
+    def save_action_on_best_line(self, action, img, best_line):
+        x1, y1, x2, y2 = best_line[0]
+        
+        plt.figure(figsize=(10, 8))
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB for correct colors
+        plt.plot([x1, x2], [y1, y2], 'g-', linewidth=2)  # Draw green line
+        
+        # Set title with action information
+        plt.title(f"Linear: {action[0]:.2f}, Angular: {action[1]:.2f}")
+        
+        # Remove axes for cleaner look
+        plt.axis('off')
+        
+        # Save and close
+        os.makedirs("video", exist_ok=True) 
+        plt.savefig(f"video/line_follower_{self.frame}.png")
+        plt.close()
+
 
     def pipeline(self, img):
         # image loading
         img = self.convert_to_cv2_image(img)
+
+        # undistort image
+        if self.config.get("undistort_image"):
+            img = self.undistort_image(
+                img,
+                np.array([[290.46301,0.,312.90291],[0.,290.3703,203.01488], [0.,0.,1.]]), 
+                np.array([-2.79797e-01,6.43090e-02,-6.80000e-05,1.96700e-03,0.00000e+00])
+            )
 
         if self.config.get("debug") > 3:
             self.display_image("Original Image", img)
@@ -216,7 +281,9 @@ class LineFollower:
         lines = self.hough_transform(edges)
 
         # get the best line
-        best_line = self.get_best_line(lines)
+        print(img.shape)
+        width = img.shape[1]
+        best_line = self.get_best_line(lines, width)
 
         if self.config.get("debug") > 3 and best_line is not None:
             result = self.draw_lines(img_cropped, lines)
@@ -227,4 +294,10 @@ class LineFollower:
 
         # determine the action with the best line
         action = self.action(best_line)
+
+        if self.config.get("debug") > 0 and best_line is not None:
+            result = self.draw_lines(img_cropped, [best_line])
+            self.save_action_on_best_line(action, result, best_line)
+        self.frame += 1
+
         return action

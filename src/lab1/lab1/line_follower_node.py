@@ -35,13 +35,13 @@ class LineFollowerNode(Node):
         # Create publisher for robot movement
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
 
-        self.timer = self.create_timer(
-            3.0, self.timer_callback
-        )  # 1 Hz frequency comment out later
+        # self.timer = self.create_timer(
+        #     3.0, self.timer_callback
+        # )  # 1 Hz frequency comment out later
 
         # Subscribe to camera image
         self.image_sub = self.create_subscription(
-            Image, "/rae/stereo_front/image_raw", self.image_callback, 10
+            Image, "/rae/right/image_raw", self.image_callback, 10
         )
 
         self.bridge = CvBridge()
@@ -68,7 +68,7 @@ class LineFollowerNode(Node):
     def image_callback(self, msg):
         # Convert ROS Image message to OpenCV image
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        cv_image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
+        # cv_image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
 
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
