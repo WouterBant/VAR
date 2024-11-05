@@ -166,7 +166,7 @@ class LineFollower:
             elif self.config.get("debug") > 1:
                 print(f"Discarding line with length {length} and angle {angle}")
         
-        if not best_line:
+        if best_line is None:
             return None
         
         x1, y1, x2, y2 = best_line[0]
@@ -200,6 +200,7 @@ class LineFollower:
 
             if self.config.get("smooth_angle"):
                 lmbda = self.config.get("smooth_lambda")
+                line_angle *= -1 # Invert the angle TODO maybe not do this
                 new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
                 
             action = (cur_lin, new_ang)
