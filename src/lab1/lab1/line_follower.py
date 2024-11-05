@@ -146,7 +146,7 @@ class LineFollower:
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             angle = abs(np.degrees(np.arctan2(y2 - y1, x2 - x1)))
             x = x1 if y1 < y2 else x2
-            distance_to_center = abs(x - self.last_x / 2)
+            distance_to_center = abs(x - self.last_x)
             if self.config.get("loss") == "distance":
                 loss = distance_to_center
             elif self.config.get("loss") == "length":
