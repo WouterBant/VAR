@@ -12,6 +12,7 @@ class LineFollower:
             "angular_speed": self.config.get("initial_angular_speed"),
         }
         self.frame = 0
+        self.last_x = None
 
     def undistort_image(self, image, camera_matrix, dist_coeffs):
         h, w = image.shape[:2]
@@ -135,16 +136,17 @@ class LineFollower:
         )
         return lines
 
-    def get_best_line(self, lines, width):
+    def get_best_line(self, lines):
         # alternatively, we can score all of them and choose the best one
         best_line = None
         best_loss = float("inf")
+
         for line in lines:
             x1, y1, x2, y2 = line[0]
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             angle = abs(np.degrees(np.arctan2(y2 - y1, x2 - x1)))
             x = x1 if y1 < y2 else x2
-            distance_to_center = abs(x - width / 2)
+            distance_to_center = abs(x - self.last_x / 2)
             if self.config.get("loss") == "distance":
                 loss = distance_to_center
             elif self.config.get("loss") == "length":
@@ -163,6 +165,14 @@ class LineFollower:
                     print(f"Found line with length {length} and angle {angle}")
             elif self.config.get("debug") > 1:
                 print(f"Discarding line with length {length} and angle {angle}")
+        
+        if not best_line:
+            return None
+        
+        x1, y1, x2, y2 = best_line[0]
+        x = x1 if y1 < y2 else x2
+        self.last_x = x
+
         return best_line
 
     def action(self, best_line):
@@ -281,9 +291,9 @@ class LineFollower:
         lines = self.hough_transform(edges)
 
         # get the best line
-        print(img.shape)
-        width = img.shape[1]
-        best_line = self.get_best_line(lines, width)
+        if self.last_x is None:
+            self.last_x = img_cropped.shape[1] // 2
+        best_line = self.get_best_line(lines)
 
         if self.config.get("debug") > 3 and best_line is not None:
             result = self.draw_lines(img_cropped, lines)

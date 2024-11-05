@@ -9,7 +9,7 @@ filter_high_angle: 115
 binary_threshold: 240
 canny_lower: 100
 canny_upper: 150
-initial_linear_speed: 10
+initial_linear_speed: 10.0
 initial_angular_speed: 0.0
 sobel_threshold: 50
 hough_threshold: 30
