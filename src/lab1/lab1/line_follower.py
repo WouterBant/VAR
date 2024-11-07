@@ -27,6 +27,8 @@ class LineFollower:
         
         Returns:
         numpy.ndarray: The undistorted image.
+
+        https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html#ga69f2545a8b62a6b0fc2ee060dc30559d
         """
         h, w = img.shape[:2]
         
@@ -200,16 +202,16 @@ class LineFollower:
                 (line_angle - 90) / 180 if line_angle > 0 else (90 + line_angle) / 180
             )
 
-            if self.config.get("debug") > 0:
-                direction = "left" if line_angle > 0 else "right"
-                print(f"Turning {direction} with: {abs(line_angle)} rad/s")
-
             if self.config.get("smooth_angle"):
                 lmbda = self.config.get("smooth_lambda")
                 line_angle *= 1 # Invert the angle TODO maybe not do this
                 new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
-                new_ang *= 2.5      
-                
+                new_ang *= 0.5     
+
+            if self.config.get("debug") > 0:
+                direction = "left" if line_angle > 0 else "right"
+                print(f"Turning {direction} with: {abs(line_angle)} rad/s")
+
             action = (cur_lin, new_ang)
             self.movement["angular_speed"] = action[1]
 

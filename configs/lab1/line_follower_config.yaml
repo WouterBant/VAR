@@ -1,15 +1,15 @@
-method: "None"  # Options: "canny", "sobel", "None"
+method: "canny"  # Options: "canny", "sobel", "None"
 enhance_vertical_edges: true
 blur_image: true
 dilate_image: true
 smooth_angle: true
-smooth_lambda: 0.0
+smooth_lambda: 0.2
 filter_low_angle: 65
 filter_high_angle: 115
 binary_threshold: 240
 canny_lower: 100
 canny_upper: 150
-initial_linear_speed: 0.2
+initial_linear_speed: 0.3
 initial_angular_speed: 0.0
 sobel_threshold: 50
 hough_threshold: 30
@@ -18,5 +18,5 @@ hough_max_line_gap: 50
 loss: "distance"
 undistort_image: true
 undistort_method: "default"
-save_images: false 
-debug: 4
+save_images: true 
+debug: 3
