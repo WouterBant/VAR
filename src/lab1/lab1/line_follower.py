@@ -47,6 +47,37 @@ class LineFollower:
         x, y, w, h = roi
         undistorted = undistorted[y:y+h, x:x+w]
         return undistorted
+    
+    def _undistort_image(self, img):
+        if self.config.get("undistort_method") == "default":
+                img = self.undistort_image(
+                    img,
+                    np.array([[290.46301,0.,312.90291],[0.,290.3703,203.01488], [0.,0.,1.]]), 
+                    np.array([-2.79797e-01,6.43090e-02,-6.80000e-05,1.96700e-03,0.00000e+00])
+                )
+        elif self.config.get("undistort_method") == "rational":
+            img = self.undistort_image(
+                img,
+                np.array([[273.20605262,   0.        , 320.87089782],
+        [  0.        , 273.08427035, 203.25003755],
+        [  0.        ,   0.        ,   1.        ]]),
+                np.array([[-0.14005281, -0.1463477 , -0.00050158,  0.00081933,  0.00344204,
+            0.17342913, -0.26600101, -0.00599146,  0.        ,  0.        ,
+            0.        ,  0.        ,  0.        ,  0.        ]]),
+                model='rational'
+            )
+        elif self.config.get("undistort_method") == "thin_prism":
+            img = self.undistort_image(
+                img,
+                np.array([[274.61629303, 0. , 305.28148118], 
+                        [ 0. , 274.71260003, 192.29090248],
+                        [ 0. , 0. , 1. ]]),
+                np.array([[-0.29394562, 0.11084073, -0.00548286, -0.00508527, -0.02123716, 
+                        0. , 0. , 0. , 0.019926 , -0.00193285, 
+                        0.01534379, -0.00206454]]),
+                model='thin_prism'
+            )
+        return img
         
     def convert_to_cv2_image(self, img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -202,11 +233,12 @@ class LineFollower:
                 (line_angle - 90) / 180 if line_angle > 0 else (90 + line_angle) / 180
             )
 
-            if self.config.get("smooth_angle"):
-                lmbda = self.config.get("smooth_lambda")
-                line_angle *= 1 # Invert the angle TODO maybe not do this
-                new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
-                new_ang *= 0.5     
+            lmbda = self.config.get("smooth_lambda")
+            new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle*0.5
+
+            max_angular_speed = self.config.get("max_angular_speed", 0.5)
+            new_ang = max(-max_angular_speed, min(max_angular_speed, new_ang))
+
 
             if self.config.get("debug") > 0:
                 direction = "left" if line_angle > 0 else "right"
@@ -218,6 +250,54 @@ class LineFollower:
         if self.config.get("debug") > 0:
             print(f"Old action: {(cur_lin, cur_ang)} -> New action: {action}")
         return action
+
+    def easy_action(self, best_line, width):
+        cur_lin = self.movement["linear_speed"]
+        cur_ang = self.movement["angular_speed"]
+
+        if best_line is None:
+            # slightly decrease the linear speed
+            action = (0.98 * cur_lin, cur_ang)
+            self.movement["linear_speed"] = action[0]
+        else:
+            x1, y1, x2, y2 = best_line[0]
+            if x1 > x2:
+                x1, y1, x2, y2 = x2, y2, x1, y1
+
+            line_angle = np.degrees(np.arctan2(y2 - y1, x2 - x1))
+            line_angle = (
+                (line_angle - 90) / 180 if line_angle > 0 else (90 + line_angle) / 180
+            )
+            line_angle = abs(line_angle)
+
+            if self.config.get("horizon_center"):
+                x = x1 if y1 > y2 else x2  # keep horizon point center
+            else:
+                x = x2 if y1 > y2 else x1  # keep closest point center
+
+            if x < width / 2:  # point is too far left
+                new_ang = line_angle  # go to left to center it
+            else:
+                new_ang = -line_angle
+
+            lmbda = self.config.get("smooth_lambda")
+            new_ang = lmbda * cur_ang + (1 - lmbda) * 0.5 * new_ang
+
+            max_angular_speed = self.config.get("max_angular_speed", 0.5)
+            new_ang = max(-max_angular_speed, min(max_angular_speed, new_ang))
+
+            if self.config.get("debug") > 0:
+                print(f"Line angle: {line_angle}")
+                direction = "left" if new_ang > 0 else "right"
+                print(f"Turning {direction} with: {abs(new_ang)} rad/s")
+
+            action = (cur_lin, new_ang)
+            self.movement["angular_speed"] = action[1]
+
+        if self.config.get("debug") > 0:
+            print(f"Old action: {(cur_lin, cur_ang)} -> New action: {action}")
+        return action
+
 
     def display_image(self, title, image):
         plt.figure(figsize=(10, 10))
@@ -268,34 +348,7 @@ class LineFollower:
 
         # undistort image
         if self.config.get("undistort_image"):
-            if self.config.get("undistort_method") == "default":
-                img = self.undistort_image(
-                    img,
-                    np.array([[290.46301,0.,312.90291],[0.,290.3703,203.01488], [0.,0.,1.]]), 
-                    np.array([-2.79797e-01,6.43090e-02,-6.80000e-05,1.96700e-03,0.00000e+00])
-                )
-            elif self.config.get("undistort_method") == "rational":
-                img = self.undistort_image(
-                    img,
-                    np.array([[273.20605262,   0.        , 320.87089782],
-           [  0.        , 273.08427035, 203.25003755],
-           [  0.        ,   0.        ,   1.        ]]),
-                    np.array([[-0.14005281, -0.1463477 , -0.00050158,  0.00081933,  0.00344204,
-             0.17342913, -0.26600101, -0.00599146,  0.        ,  0.        ,
-             0.        ,  0.        ,  0.        ,  0.        ]]),
-                    model='rational'
-                )
-            elif self.config.get("undistort_method") == "thin_prism":
-                img = self.undistort_image(
-                    img,
-                    np.array([[274.61629303, 0. , 305.28148118], 
-                            [ 0. , 274.71260003, 192.29090248],
-                            [ 0. , 0. , 1. ]]),
-                    np.array([[-0.29394562, 0.11084073, -0.00548286, -0.00508527, -0.02123716, 
-                            0. , 0. , 0. , 0.019926 , -0.00193285, 
-                            0.01534379, -0.00206454]]),
-                    model='thin_prism'
-                )
+            img = self._undistort_image(img)
 
         if self.config.get("debug") > 3:
             self.display_image("Original Image", img)
@@ -340,7 +393,10 @@ class LineFollower:
             self.display_image("Best Line", result)
 
         # determine the action with the best line
-        action = self.action(best_line)
+        if self.config.get("easy_action"):
+            action = self.easy_action(best_line, img.shape[1])
+        else:
+            action = self.action(best_line)
 
         if self.config.get("save_images") > 0 and best_line is not None:
             result = self.draw_lines(img_cropped, [best_line])
