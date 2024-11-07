@@ -17,4 +17,5 @@ hough_min_line_length: 60
 hough_max_line_gap: 50
 loss: "distance"
 undistort_image: true
-debug: 2
+save_images: false
+debug: 4

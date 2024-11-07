@@ -200,7 +200,7 @@ class LineFollower:
 
             if self.config.get("smooth_angle"):
                 lmbda = self.config.get("smooth_lambda")
-                line_angle *= -1 # Invert the angle TODO maybe not do this
+                line_angle *= 1 # Invert the angle TODO maybe not do this
                 new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
                 
             action = (cur_lin, new_ang)
@@ -252,6 +252,10 @@ class LineFollower:
     def pipeline(self, img):
         # image loading
         img = self.convert_to_cv2_image(img)
+
+        if self.config.get("save_images"):
+            os.makedirs("video", exist_ok=True)
+            plt.imsave(f"video/initial_image_{self.frame}.png", img)
 
         # undistort image
         if self.config.get("undistort_image"):
@@ -306,7 +310,7 @@ class LineFollower:
         # determine the action with the best line
         action = self.action(best_line)
 
-        if self.config.get("debug") > 0 and best_line is not None:
+        if self.config.get("save_images") > 0 and best_line is not None:
             result = self.draw_lines(img_cropped, [best_line])
             self.save_action_on_best_line(action, result, best_line)
         self.frame += 1
