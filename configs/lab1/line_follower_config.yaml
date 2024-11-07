@@ -16,7 +16,7 @@ sobel_threshold: 50
 hough_threshold: 30
 hough_min_line_length: 60
 hough_max_line_gap: 50
-loss: "length"
+loss: "distance"
 undistort_image: true
 undistort_method: "default"
 easy_action: true
