@@ -12,34 +12,40 @@ class LineFollower:
             "angular_speed": self.config.get("initial_angular_speed"),
         }
         self.frame = 0
-        self.last_x = None
+        self.last_x = None    
 
-    def undistort_image(self, image, camera_matrix, dist_coeffs):
-        h, w = image.shape[:2]
+    def undistort_image(self, img, K, dist_coeffs, model='default'):
+        """
+        Undistort an image using different rectification techniques.
         
-        # Generate new camera matrix
-        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(
-            camera_matrix, 
-            dist_coeffs, 
-            (w,h), 
-            1, 
-            (w,h)
-        )
+        Parameters:
+        img (numpy.ndarray): The input distorted image.
+        K (numpy.ndarray): The intrinsic camera matrix.
+        dist_coeffs (numpy.ndarray): The distortion coefficients.
+        model (str): The rectification model to use. Default is 'default'.
+                    Options: 'default', 'rational', 'thin_prism'.
         
-        undistorted = cv2.undistort(
-            image, 
-            camera_matrix, 
-            dist_coeffs, 
-            None, 
-            newcameramtx
-        )
+        Returns:
+        numpy.ndarray: The undistorted image.
+        """
+        h, w = img.shape[:2]
+        
+        if model == 'default':
+            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (w, h), 1, (w, h))
+            undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
+        elif model == 'rational':
+            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (w, h), 1, (w, h))
+            undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
+        elif model == 'thin_prism':
+            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (w, h), 1, (w, h))
+            map1, map2 = cv2.initUndistortRectifyMap(K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2)
+            undistorted = cv2.remap(img, map1, map2, cv2.INTER_LINEAR)
+        else:
+            raise ValueError("Invalid rectification model. Choose 'default', 'rational', or 'thin_prism'.")
         x, y, w, h = roi
         undistorted = undistorted[y:y+h, x:x+w]
-        
-        if self.config.get("debug") > 3:
-            self.display_image("Undistorted Image", undistorted)
         return undistorted
-    
+        
     def convert_to_cv2_image(self, img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if self.config.get("debug") > 3:
@@ -202,6 +208,7 @@ class LineFollower:
                 lmbda = self.config.get("smooth_lambda")
                 line_angle *= 1 # Invert the angle TODO maybe not do this
                 new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
+                new_ang *= 2.5      
                 
             action = (cur_lin, new_ang)
             self.movement["angular_speed"] = action[1]
@@ -259,11 +266,34 @@ class LineFollower:
 
         # undistort image
         if self.config.get("undistort_image"):
-            img = self.undistort_image(
-                img,
-                np.array([[290.46301,0.,312.90291],[0.,290.3703,203.01488], [0.,0.,1.]]), 
-                np.array([-2.79797e-01,6.43090e-02,-6.80000e-05,1.96700e-03,0.00000e+00])
-            )
+            if self.config.get("undistort_method") == "default":
+                img = self.undistort_image(
+                    img,
+                    np.array([[290.46301,0.,312.90291],[0.,290.3703,203.01488], [0.,0.,1.]]), 
+                    np.array([-2.79797e-01,6.43090e-02,-6.80000e-05,1.96700e-03,0.00000e+00])
+                )
+            elif self.config.get("undistort_method") == "rational":
+                img = self.undistort_image(
+                    img,
+                    np.array([[273.20605262,   0.        , 320.87089782],
+           [  0.        , 273.08427035, 203.25003755],
+           [  0.        ,   0.        ,   1.        ]]),
+                    np.array([[-0.14005281, -0.1463477 , -0.00050158,  0.00081933,  0.00344204,
+             0.17342913, -0.26600101, -0.00599146,  0.        ,  0.        ,
+             0.        ,  0.        ,  0.        ,  0.        ]]),
+                    model='rational'
+                )
+            elif self.config.get("undistort_method") == "thin_prism":
+                img = self.undistort_image(
+                    img,
+                    np.array([[274.61629303, 0. , 305.28148118], 
+                            [ 0. , 274.71260003, 192.29090248],
+                            [ 0. , 0. , 1. ]]),
+                    np.array([[-0.29394562, 0.11084073, -0.00548286, -0.00508527, -0.02123716, 
+                            0. , 0. , 0. , 0.019926 , -0.00193285, 
+                            0.01534379, -0.00206454]]),
+                    model='thin_prism'
+                )
 
         if self.config.get("debug") > 3:
             self.display_image("Original Image", img)
@@ -287,7 +317,7 @@ class LineFollower:
         if self.config.get("method") == "canny":
             edges = self.canny_edge_detection(img)
         elif self.config.get("method") == "sobel":
-            edges = self.sobel_edge_detection(edges)
+            edges = self.sobel_edge_detection(img)
 
         if self.config.get("enhance_vertical_edges"):
             edges = self.enhance_vertical_edges(img)

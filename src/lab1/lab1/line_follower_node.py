@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
 from lab1.line_follower import LineFollower
@@ -43,6 +43,9 @@ class LineFollowerNode(Node):
         self.image_sub = self.create_subscription(
             Image, "/rae/right/image_raw", self.image_callback, 10
         )
+        # self.image_sub = self.create_subscription(
+        #     CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10
+        # )
 
         self.bridge = CvBridge()
 
@@ -70,6 +73,8 @@ class LineFollowerNode(Node):
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         # cv_image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
 
+        # np_arr = np.frombuffer(msg.data, np.uint8)
+        # cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
 

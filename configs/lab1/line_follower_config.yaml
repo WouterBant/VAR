@@ -1,9 +1,9 @@
-line_detection_method: "None"  # Options: "canny", "sobel", "None"
+method: "None"  # Options: "canny", "sobel", "None"
 enhance_vertical_edges: true
 blur_image: true
 dilate_image: true
 smooth_angle: true
-smooth_lambda: 0.5
+smooth_lambda: 0.0
 filter_low_angle: 65
 filter_high_angle: 115
 binary_threshold: 240
@@ -17,5 +17,6 @@ hough_min_line_length: 60
 hough_max_line_gap: 50
 loss: "distance"
 undistort_image: true
-save_images: false
+undistort_method: "default"
+save_images: false 
 debug: 4
