@@ -3,7 +3,7 @@ enhance_vertical_edges: true
 blur_image: true
 dilate_image: true
 smooth_angle: true
-smooth_lambda: 0.2
+smooth_lambda: 0.0
 filter_low_angle: 65
 filter_high_angle: 115
 binary_threshold: 240

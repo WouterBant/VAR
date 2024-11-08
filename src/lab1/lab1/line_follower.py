@@ -12,7 +12,8 @@ class LineFollower:
             "angular_speed": self.config.get("initial_angular_speed"),
         }
         self.frame = 0
-        self.last_x = None    
+        self.last_x = None
+        self.last_distance = 0
 
     def undistort_image(self, img, K, dist_coeffs, model='default'):
         """
@@ -279,6 +280,17 @@ class LineFollower:
                 new_ang = line_angle  # go to left to center it
             else:
                 new_ang = -line_angle
+
+            cur_distance = abs(x - width / 2)
+            if self.last_distance > cur_distance:
+                new_ang = 0  # already going to the right direction
+                if self.config.get("debug") > 0:
+                    print("Already going in the right direction")
+            self.last_distance = cur_distance
+
+            if (cur_distance < 30 and line_angle*180 < 10) or self.frame > 15:
+                # we are now sufficiently under the line
+                self.config["horizon_center"] = True  # start following the horizon
 
             lmbda = self.config.get("smooth_lambda")
             new_ang = lmbda * cur_ang + (1 - lmbda) * 0.5 * new_ang
