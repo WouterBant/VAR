@@ -20,6 +20,6 @@ loss: "distance"
 undistort_image: true
 undistort_method: "default"
 easy_action: true
-horizon_center: true
+horizon_center: false
 save_images: false 
 debug: 4
