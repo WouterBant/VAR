@@ -281,7 +281,7 @@ class LineFollower:
                 # (y1 - y2) / (x1 - x2) = (y1 - height) / (x1 - x)
                 # x = x1 - (y1 - height) * (x1 - x2) / (y1 - y2)
                 x = x1 - (y1 - height) * (x1 - x2) / (y1 - y2)
-                if self.config.get("debug") > 0:
+                if self.config.get("debug") > 1:
                     print(f"{x1}, {x2}, {y1}, {y2}, {height }")
                     print(f"frame: {self.frame}")
                     print(f"Projected horizon point: {x}")

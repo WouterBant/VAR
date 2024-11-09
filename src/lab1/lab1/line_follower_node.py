@@ -9,6 +9,7 @@ import numpy as np
 import cv2
 import os
 import yaml
+from collections import deque as Deque
 
 
 class LineFollowerNode(Node):
@@ -43,7 +44,20 @@ class LineFollowerNode(Node):
             CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10
         )
 
+        self.timer = self.create_timer(0.8, self.timer_callback)
+
+        self.queue = Deque(maxlen=5)
         self.bridge = CvBridge()
+    
+    def timer_callback(self):
+        average_linear = sum(i for (i, _) in self.queue) / len(self.queue)
+        average_angular = sum(i for (_, i) in self.queue) / len(self.queue)
+        print(len(self.queue), "HEREE   ")
+        self.queue.clear()
+        twist_msg = Twist()
+        twist_msg.linear.x = average_linear  # Forward/backward
+        twist_msg.angular.z = average_angular  # Rotation angle per second
+        self.cmd_vel_pub.publish(twist_msg)
 
     def image_callback(self, msg):
         # Convert ROS Image message to OpenCV image
@@ -55,13 +69,7 @@ class LineFollowerNode(Node):
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
 
-        # Create and publish Twist message
-        twist_msg = Twist()
-        twist_msg.linear.x = linear_vel  # Forward/backward
-        twist_msg.angular.z = angular_vel  # Rotation angle per second
-
-        self.cmd_vel_pub.publish(twist_msg)
-
+        self.queue.append((linear_vel, angular_vel))
 
 def main(args=None):
     rclpy.init(args=args)
