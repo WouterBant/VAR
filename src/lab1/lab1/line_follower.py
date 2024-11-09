@@ -15,71 +15,129 @@ class LineFollower:
         self.last_x = None
         self.last_distance = 0
 
-    def undistort_image(self, img, K, dist_coeffs, model='default'):
+    def undistort_image(self, img, K, dist_coeffs, model="default"):
         """
         Undistort an image using different rectification techniques.
-        
+
         Parameters:
         img (numpy.ndarray): The input distorted image.
         K (numpy.ndarray): The intrinsic camera matrix.
         dist_coeffs (numpy.ndarray): The distortion coefficients.
         model (str): The rectification model to use. Default is 'default'.
                     Options: 'default', 'rational', 'thin_prism'.
-        
+
         Returns:
         numpy.ndarray: The undistorted image.
 
         https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html#ga69f2545a8b62a6b0fc2ee060dc30559d
         """
         h, w = img.shape[:2]
-        
-        if model == 'default':
-            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (w, h), 1, (w, h))
+
+        if model == "default":
+            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
+                K, dist_coeffs, (w, h), 1, (w, h)
+            )
             undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
-        elif model == 'rational':
-            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (w, h), 1, (w, h))
+        elif model == "rational":
+            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
+                K, dist_coeffs, (w, h), 1, (w, h)
+            )
             undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
-        elif model == 'thin_prism':
-            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (w, h), 1, (w, h))
-            map1, map2 = cv2.initUndistortRectifyMap(K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2)
+        elif model == "thin_prism":
+            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
+                K, dist_coeffs, (w, h), 1, (w, h)
+            )
+            map1, map2 = cv2.initUndistortRectifyMap(
+                K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2
+            )
             undistorted = cv2.remap(img, map1, map2, cv2.INTER_LINEAR)
         else:
-            raise ValueError("Invalid rectification model. Choose 'default', 'rational', or 'thin_prism'.")
+            raise ValueError(
+                "Invalid rectification model. Choose 'default', 'rational', or 'thin_prism'."
+            )
         x, y, w, h = roi
-        undistorted = undistorted[y:y+h, x:x+w]
+        undistorted = undistorted[y : y + h, x : x + w]
         return undistorted
-    
+
     def _undistort_image(self, img):
         if self.config.get("undistort_method") == "default":
-                img = self.undistort_image(
-                    img,
-                    np.array([[290.46301,0.,312.90291],[0.,290.3703,203.01488], [0.,0.,1.]]), 
-                    np.array([-2.79797e-01,6.43090e-02,-6.80000e-05,1.96700e-03,0.00000e+00])
-                )
+            img = self.undistort_image(
+                img,
+                np.array(
+                    [
+                        [290.46301, 0.0, 312.90291],
+                        [0.0, 290.3703, 203.01488],
+                        [0.0, 0.0, 1.0],
+                    ]
+                ),
+                np.array(
+                    [-2.79797e-01, 6.43090e-02, -6.80000e-05, 1.96700e-03, 0.00000e00]
+                ),
+            )
         elif self.config.get("undistort_method") == "rational":
             img = self.undistort_image(
                 img,
-                np.array([[273.20605262,   0.        , 320.87089782],
-        [  0.        , 273.08427035, 203.25003755],
-        [  0.        ,   0.        ,   1.        ]]),
-                np.array([[-0.14005281, -0.1463477 , -0.00050158,  0.00081933,  0.00344204,
-            0.17342913, -0.26600101, -0.00599146,  0.        ,  0.        ,
-            0.        ,  0.        ,  0.        ,  0.        ]]),
-                model='rational'
+                np.array(
+                    [
+                        [273.20605262, 0.0, 320.87089782],
+                        [0.0, 273.08427035, 203.25003755],
+                        [0.0, 0.0, 1.0],
+                    ]
+                ),
+                np.array(
+                    [
+                        [
+                            -0.14005281,
+                            -0.1463477,
+                            -0.00050158,
+                            0.00081933,
+                            0.00344204,
+                            0.17342913,
+                            -0.26600101,
+                            -0.00599146,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                        ]
+                    ]
+                ),
+                model="rational",
             )
         elif self.config.get("undistort_method") == "thin_prism":
             img = self.undistort_image(
                 img,
-                np.array([[274.61629303, 0. , 305.28148118], 
-                        [ 0. , 274.71260003, 192.29090248],
-                        [ 0. , 0. , 1. ]]),
-                np.array([[-0.29394562, 0.11084073, -0.00548286, -0.00508527, -0.02123716, 
-                        0. , 0. , 0. , 0.019926 , -0.00193285, 
-                        0.01534379, -0.00206454]]),
-                model='thin_prism'
+                np.array(
+                    [
+                        [274.61629303, 0.0, 305.28148118],
+                        [0.0, 274.71260003, 192.29090248],
+                        [0.0, 0.0, 1.0],
+                    ]
+                ),
+                np.array(
+                    [
+                        [
+                            -0.29394562,
+                            0.11084073,
+                            -0.00548286,
+                            -0.00508527,
+                            -0.02123716,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.019926,
+                            -0.00193285,
+                            0.01534379,
+                            -0.00206454,
+                        ]
+                    ]
+                ),
+                model="thin_prism",
             )
         return img
-        
+
     def convert_to_cv2_image(self, img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if self.config.get("debug") > 3:
@@ -205,10 +263,10 @@ class LineFollower:
                     print(f"Found line with length {length} and angle {angle}")
             elif self.config.get("debug") > 1:
                 print(f"Discarding line with length {length} and angle {angle}")
-        
+
         if best_line is None:
             return None
-        
+
         x1, y1, x2, y2 = best_line[0]
         x = x1 if y1 < y2 else x2
         self.last_x = x
@@ -239,7 +297,6 @@ class LineFollower:
 
             max_angular_speed = self.config.get("max_angular_speed", 0.5)
             new_ang = max(-max_angular_speed, min(max_angular_speed, new_ang))
-
 
             if self.config.get("debug") > 0:
                 direction = "left" if line_angle > 0 else "right"
@@ -286,7 +343,7 @@ class LineFollower:
                     print(f"frame: {self.frame}")
                     print(f"Projected horizon point: {x}")
                     print(f"width: {width}")
-                new_ang = (width / 2 - x) / (6*width)
+                new_ang = (width / 2 - x) / (6 * width)
             else:
                 x = x2 if y1 > y2 else x1  # keep closest point center
 
@@ -303,7 +360,7 @@ class LineFollower:
             #         print("Already going in the right direction")
             self.last_distance = cur_distance
 
-            if (cur_distance < 30 and line_angle*180 < 10) or self.frame > 15:
+            if (cur_distance < 30 and line_angle * 180 < 10) or self.frame > 15:
                 # we are now sufficiently under the line
                 self.config["horizon_center"] = True  # start following the horizon
 
@@ -325,7 +382,6 @@ class LineFollower:
             print(f"Old action: {(cur_lin, cur_ang)} -> New action: {action}")
         return action
 
-
     def display_image(self, title, image):
         plt.figure(figsize=(10, 10))
         plt.title(title)
@@ -345,25 +401,26 @@ class LineFollower:
                 )  # Draw green lines
 
         return line_image
-    
+
     def save_action_on_best_line(self, action, img, best_line):
         x1, y1, x2, y2 = best_line[0]
-        
+
         plt.figure(figsize=(10, 8))
-        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB for correct colors
-        plt.plot([x1, x2], [y1, y2], 'g-', linewidth=2)  # Draw green line
-        
+        plt.imshow(
+            cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        )  # Convert BGR to RGB for correct colors
+        plt.plot([x1, x2], [y1, y2], "g-", linewidth=2)  # Draw green line
+
         # Set title with action information
         plt.title(f"Linear: {action[0]:.2f}, Angular: {action[1]:.2f}")
-        
+
         # Remove axes for cleaner look
-        plt.axis('off')
-        
+        plt.axis("off")
+
         # Save and close
-        os.makedirs("video", exist_ok=True) 
+        os.makedirs("video", exist_ok=True)
         plt.savefig(f"video/line_follower_{self.frame}.png")
         plt.close()
-
 
     def pipeline(self, img):
         # image loading
@@ -421,7 +478,9 @@ class LineFollower:
 
         # determine the action with the best line
         if self.config.get("easy_action"):
-            action = self.easy_action(best_line, width=img.shape[1], height=img.shape[0])
+            action = self.easy_action(
+                best_line, width=img.shape[1], height=img.shape[0]
+            )
         else:
             action = self.action(best_line)
 

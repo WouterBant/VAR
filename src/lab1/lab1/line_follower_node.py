@@ -34,7 +34,9 @@ class LineFollowerNode(Node):
         self.line_follower = LineFollower(config=self.config)
 
         # Create publisher for robot movement
-        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)  # TODO set this to one
+        self.cmd_vel_pub = self.create_publisher(
+            Twist, "/cmd_vel", 1
+        )  # TODO set this to one
 
         # Subscribe to camera image
         # self.image_sub = self.create_subscription(
@@ -48,7 +50,7 @@ class LineFollowerNode(Node):
 
         self.queue = Deque(maxlen=5)
         self.bridge = CvBridge()
-    
+
     def timer_callback(self):
         average_linear = sum(i for (i, _) in self.queue) / len(self.queue)
         average_angular = sum(i for (_, i) in self.queue) / len(self.queue)
@@ -70,6 +72,7 @@ class LineFollowerNode(Node):
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
 
         self.queue.append((linear_vel, angular_vel))
+
 
 def main(args=None):
     rclpy.init(args=args)
