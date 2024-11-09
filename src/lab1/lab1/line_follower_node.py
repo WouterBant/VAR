@@ -33,58 +33,31 @@ class LineFollowerNode(Node):
         self.line_follower = LineFollower(config=self.config)
 
         # Create publisher for robot movement
-        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
-
-        # self.timer = self.create_timer(
-        #     3.0, self.timer_callback
-        # )  # 1 Hz frequency comment out later
+        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)  # TODO set this to one
 
         # Subscribe to camera image
-        self.image_sub = self.create_subscription(
-            Image, "/rae/right/image_raw", self.image_callback, 10
-        )
         # self.image_sub = self.create_subscription(
-        #     CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10
+        #     Image, "/rae/right/image_raw", self.image_callback, 1  # TODO set this to one
         # )
+        self.image_sub = self.create_subscription(
+            CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10
+        )
 
         self.bridge = CvBridge()
 
-    def timer_callback(self):
-        cv_image = cv2.imread("assets/classroom.png")
-        # horizontally flip image
-        # cv_image = cv2.flip(cv_image, 1)
-
-        # Process image through your pipeline
-        linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
-
-        # Create and publish Twist message
-        twist_msg = Twist()
-        twist_msg.linear.x = linear_vel  # Forward/backward
-        twist_msg.linear.y = 0.0
-        twist_msg.linear.z = 0.0
-        twist_msg.angular.x = 0.0
-        twist_msg.angular.y = 0.0
-        twist_msg.angular.z = angular_vel  # Rotation angle per second
-
-        self.cmd_vel_pub.publish(twist_msg)
-
     def image_callback(self, msg):
         # Convert ROS Image message to OpenCV image
-        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        # cv_image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
+        # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
-        # np_arr = np.frombuffer(msg.data, np.uint8)
-        # cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        np_arr = np.frombuffer(msg.data, np.uint8)
+        cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
         # Process image through your pipeline
         linear_vel, angular_vel = self.line_follower.pipeline(cv_image)
 
         # Create and publish Twist message
         twist_msg = Twist()
         twist_msg.linear.x = linear_vel  # Forward/backward
-        twist_msg.linear.y = 0.0
-        twist_msg.linear.z = 0.0
-        twist_msg.angular.x = 0.0
-        twist_msg.angular.y = 0.0
         twist_msg.angular.z = angular_vel  # Rotation angle per second
 
         self.cmd_vel_pub.publish(twist_msg)

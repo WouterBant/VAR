@@ -233,9 +233,9 @@ class LineFollower:
             line_angle = (
                 (line_angle - 90) / 180 if line_angle > 0 else (90 + line_angle) / 180
             )
-
+            line_angle *= 10  # TODO increase the angle
             lmbda = self.config.get("smooth_lambda")
-            new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle*0.5
+            new_ang = lmbda * cur_ang + (1 - lmbda) * line_angle
 
             max_angular_speed = self.config.get("max_angular_speed", 0.5)
             new_ang = max(-max_angular_speed, min(max_angular_speed, new_ang))
@@ -243,6 +243,7 @@ class LineFollower:
 
             if self.config.get("debug") > 0:
                 direction = "left" if line_angle > 0 else "right"
+                print(line_angle)
                 print(f"Turning {direction} with: {abs(line_angle)} rad/s")
 
             action = (cur_lin, new_ang)
@@ -252,7 +253,7 @@ class LineFollower:
             print(f"Old action: {(cur_lin, cur_ang)} -> New action: {action}")
         return action
 
-    def easy_action(self, best_line, width):
+    def easy_action(self, best_line, width, height):
         cur_lin = self.movement["linear_speed"]
         cur_ang = self.movement["angular_speed"]
 
@@ -273,19 +274,33 @@ class LineFollower:
 
             if self.config.get("horizon_center"):
                 x = x1 if y1 > y2 else x2  # keep horizon point center
+
+                # project horizon point
+                if y1 > y2:
+                    x1, x2, y1, y2 = x1, x2, y2, y1
+                # (y1 - y2) / (x1 - x2) = (y1 - height) / (x1 - x)
+                # x = x1 - (y1 - height) * (x1 - x2) / (y1 - y2)
+                x = x1 - (y1 - height) * (x1 - x2) / (y1 - y2)
+                if self.config.get("debug") > 0:
+                    print(f"{x1}, {x2}, {y1}, {y2}, {height }")
+                    print(f"frame: {self.frame}")
+                    print(f"Projected horizon point: {x}")
+                    print(f"width: {width}")
+                new_ang = (width / 2 - x) / (6*width)
             else:
                 x = x2 if y1 > y2 else x1  # keep closest point center
 
-            if x < width / 2:  # point is too far left
-                new_ang = line_angle  # go to left to center it
-            else:
-                new_ang = -line_angle
+                if x < width / 2:  # point is too far left
+                    new_ang = line_angle  # go to left to center it
+                else:
+                    new_ang = -line_angle
+            new_ang *= 10
 
             cur_distance = abs(x - width / 2)
-            if self.last_distance > cur_distance:
-                new_ang = 0  # already going to the right direction
-                if self.config.get("debug") > 0:
-                    print("Already going in the right direction")
+            # if self.last_distance > cur_distance:
+            #     new_ang = 0  # already going to the right direction
+            #     if self.config.get("debug") > 0:
+            #         print("Already going in the right direction")
             self.last_distance = cur_distance
 
             if (cur_distance < 30 and line_angle*180 < 10) or self.frame > 15:
@@ -293,7 +308,7 @@ class LineFollower:
                 self.config["horizon_center"] = True  # start following the horizon
 
             lmbda = self.config.get("smooth_lambda")
-            new_ang = lmbda * cur_ang + (1 - lmbda) * 0.5 * new_ang
+            new_ang = lmbda * cur_ang + (1 - lmbda) * new_ang
 
             max_angular_speed = self.config.get("max_angular_speed", 0.5)
             new_ang = max(-max_angular_speed, min(max_angular_speed, new_ang))
@@ -406,7 +421,7 @@ class LineFollower:
 
         # determine the action with the best line
         if self.config.get("easy_action"):
-            action = self.easy_action(best_line, img.shape[1])
+            action = self.easy_action(best_line, width=img.shape[1], height=img.shape[0])
         else:
             action = self.action(best_line)
 
