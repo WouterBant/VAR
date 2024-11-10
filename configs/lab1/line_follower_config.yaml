@@ -3,7 +3,7 @@ enhance_vertical_edges: true
 blur_image: true
 dilate_image: true
 smooth_angle: true
-smooth_lambda: 0.0
+smooth_lambda: 0.2
 filter_low_angle: 65
 filter_high_angle: 115
 binary_threshold: 240
@@ -11,7 +11,7 @@ canny_lower: 100
 canny_upper: 150
 initial_linear_speed: 0.3
 initial_angular_speed: 0.0
-max_angular_speed: 0.2
+max_angular_speed: 1.0
 sobel_threshold: 50
 hough_threshold: 30
 hough_min_line_length: 60
@@ -20,6 +20,6 @@ loss: "distance"
 undistort_image: true
 undistort_method: "default"
 easy_action: true
-horizon_center: false
+horizon_center: true
 save_images: false 
 debug: 4
