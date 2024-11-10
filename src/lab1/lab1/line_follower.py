@@ -16,21 +16,6 @@ class LineFollower:
         self.last_distance = 0
 
     def undistort_image(self, img, K, dist_coeffs, model="default"):
-        """
-        Undistort an image using different rectification techniques.
-
-        Parameters:
-        img (numpy.ndarray): The input distorted image.
-        K (numpy.ndarray): The intrinsic camera matrix.
-        dist_coeffs (numpy.ndarray): The distortion coefficients.
-        model (str): The rectification model to use. Default is 'default'.
-                    Options: 'default', 'rational', 'thin_prism'.
-
-        Returns:
-        numpy.ndarray: The undistorted image.
-
-        https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html#ga69f2545a8b62a6b0fc2ee060dc30559d
-        """
         h, w = img.shape[:2]
 
         if model == "default":
@@ -42,15 +27,30 @@ class LineFollower:
             new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
                 K, dist_coeffs, (w, h), 1, (w, h)
             )
-            undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
+            # undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
+            map1, map2 = cv2.initUndistortRectifyMap(
+            K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2
+        )
+            undistorted = cv2.remap(img, map1, map2, cv2.INTER_LANCZOS4)
+
         elif model == "thin_prism":
             new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
                 K, dist_coeffs, (w, h), 1, (w, h)
             )
+            scale_factor = 1.0
+            scaled_K = K.copy()
+            scaled_K[0,0] *= scale_factor
+            scaled_K[1,1] *= scale_factor
+            scaled_new_camera_matrix = new_camera_matrix.copy()
+            scaled_new_camera_matrix[0,0] *= scale_factor
+            scaled_new_camera_matrix[1,1] *= scale_factor
+            
             map1, map2 = cv2.initUndistortRectifyMap(
-                K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2
+                scaled_K, dist_coeffs, None, scaled_new_camera_matrix, 
+                (int(w * scale_factor), int(h * scale_factor)), cv2.CV_32FC1
             )
-            undistorted = cv2.remap(img, map1, map2, cv2.INTER_LINEAR)
+            undistorted = cv2.remap(img, map1, map2, cv2.INTER_LANCZOS4,
+                               borderMode=cv2.BORDER_REFLECT_101)
         else:
             raise ValueError(
                 "Invalid rectification model. Choose 'default', 'rational', or 'thin_prism'."
@@ -235,7 +235,6 @@ class LineFollower:
         return lines
 
     def get_best_line(self, lines):
-        # alternatively, we can score all of them and choose the best one
         best_line = None
         best_loss = float("inf")
 
@@ -245,7 +244,7 @@ class LineFollower:
             angle = abs(np.degrees(np.arctan2(y2 - y1, x2 - x1)))
             x = x1 if y1 < y2 else x2
             distance_to_previous_line = abs(x - self.last_x)
-            if self.config.get("loss") == "distance":
+            if self.config.get("loss") == "distance" or self.config.get("loss") == "distanceLength":
                 loss = distance_to_previous_line
             elif self.config.get("loss") == "length":
                 loss = -length
@@ -257,8 +256,12 @@ class LineFollower:
                 <= self.config.get("filter_high_angle")
                 and loss < best_loss
             ):
+                if best_line is not None and self.config.get("loss") == "distanceLength" and abs(best_x - x) < 20 and length < best_length:
+                    continue
                 best_loss = loss
                 best_line = line
+                best_x = x
+                best_length = length
                 if self.config.get("debug") > 1:
                     print(f"Found line with length {length} and angle {angle}")
             elif self.config.get("debug") > 1:

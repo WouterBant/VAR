@@ -40,10 +40,10 @@ class LineFollowerNode(Node):
 
         # Subscribe to camera image
         # self.image_sub = self.create_subscription(
-        #     Image, "/rae/right/image_raw", self.image_callback, 1  # TODO set this to one
+        #     Image, "/rae/right/image_raw", self.image_callback, 1
         # )
         self.image_sub = self.create_subscription(
-            CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10
+            CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10  # TODO maybe one
         )
 
         self.timer = self.create_timer(0.8, self.timer_callback)
