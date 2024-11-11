@@ -52,6 +52,8 @@ class LineFollowerNode(Node):
         self.bridge = CvBridge()
 
     def timer_callback(self):
+        if len(self.queue) == 0:
+            return
         average_linear = sum(i for (i, _) in self.queue) / len(self.queue)
         average_angular = sum(i for (_, i) in self.queue) / len(self.queue)
         print(len(self.queue), "HEREE   ")

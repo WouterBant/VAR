@@ -333,11 +333,11 @@ class LineFollower:
             line_angle = abs(line_angle)
 
             if self.config.get("horizon_center"):
-                x = x1 if y1 > y2 else x2  # keep horizon point center
+                # x = x1 if y1 > y2 else x2  # keep horizon point center
 
                 # project horizon point
                 if y1 > y2:
-                    x1, x2, y1, y2 = x1, x2, y2, y1
+                    x1, x2, y1, y2 = x2, x1, y2, y1
                 # (y1 - y2) / (x1 - x2) = (y1 - height) / (x1 - x)
                 # x = x1 - (y1 - height) * (x1 - x2) / (y1 - y2)
                 x = x1 - (y1 - height) * (x1 - x2) / (y1 - y2)
