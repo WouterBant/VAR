@@ -7,11 +7,12 @@ ARUCO_DICT = {
   "DICT_6X6_1000": cv2.aruco.DICT_6X6_1000,
   "DICT_7X7_1000": cv2.aruco.DICT_7X7_1000,
   "DICT_ARUCO_ORIGINAL": cv2.aruco.DICT_ARUCO_ORIGINAL,
-  "DICT_ARUCO_MIP_36h12": cv2.aruco.DICT_ARUCO_MIP_36h12
+  "DICT_ARUCO_MIP_36h12": cv2.aruco.DICT_ARUCO_MIP_36h12,
+  "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
 }
 
-frame = cv2.imread("image3.jpeg")
-frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+frame = cv2.imread("image2.jpeg")
+# frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 # frame = cv2.adaptiveThreshold(
 #             frame, 255, 
 #             cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -19,7 +20,7 @@ frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 #         )
 
 # crop the image
-frame = frame[500:-700, 1050:-700]
+# frame = frame[500:-700, 1050:-700]
 
 all_corners, all_marker_ids = [], []
 for desired_aruco_dictionary in ARUCO_DICT.keys():
@@ -28,11 +29,11 @@ for desired_aruco_dictionary in ARUCO_DICT.keys():
     this_aruco_parameters = cv2.aruco.DetectorParameters()
     # import code; code.interact(local=dict(globals(), **locals()))
     # 
-    this_aruco_parameters.adaptiveThreshWinSizeMin = 3
-    this_aruco_parameters.adaptiveThreshWinSizeMin = 5
-    this_aruco_parameters.adaptiveThreshWinSizeMax = 21
-    this_aruco_parameters.adaptiveThreshWinSizeStep = 4
-    this_aruco_parameters.minMarkerPerimeterRate = 0.07
+    # this_aruco_parameters.adaptiveThreshWinSizeMin = 3
+    # this_aruco_parameters.adaptiveThreshWinSizeMin = 5
+    # this_aruco_parameters.adaptiveThreshWinSizeMax = 21
+    # this_aruco_parameters.adaptiveThreshWinSizeStep = 4
+    # this_aruco_parameters.minMarkerPerimeterRate = 0.07
     # this_aruco_parameters.minMarkerPerimeterRate = 0.01
     # this_aruco_parameters.maxMarkerPerimeterRate = 4.0
 
@@ -40,6 +41,7 @@ for desired_aruco_dictionary in ARUCO_DICT.keys():
         frame, this_aruco_dictionary, parameters=this_aruco_parameters)
     all_corners.append(corners)
     all_marker_ids.append(ids)
+    print(corners, ids)
         
 # Check that at least one ArUco marker was detected
 if len(corners) > 0:
