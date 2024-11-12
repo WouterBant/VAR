@@ -1,6 +1,5 @@
 import cv2
 
-
 ARUCO_DICT = {
     "DICT_4X4_1000": cv2.aruco.DICT_4X4_1000,
     "DICT_5X5_1000": cv2.aruco.DICT_5X5_1000,
@@ -11,20 +10,12 @@ ARUCO_DICT = {
     "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11,
 }
 
-frame = cv2.imread("image.jpeg")
-# frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-# frame = cv2.adaptiveThreshold(
-#             frame, 255,
-#             cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-#             cv2.THRESH_BINARY_INV, 11, 2
-#         )
-
-# crop the image
-# frame = frame[500:-700, 1050:-700]
+frame = cv2.imread("image4.jpeg")
+if frame is None:
+    raise ValueError("Could not load image")
 
 all_corners, all_marker_ids = [], []
 for desired_aruco_dictionary in ARUCO_DICT.keys():
-    # Load the desired ArUco dictionary
     this_aruco_dictionary = cv2.aruco.getPredefinedDictionary(
         ARUCO_DICT[desired_aruco_dictionary]
     )
@@ -47,7 +38,7 @@ for desired_aruco_dictionary in ARUCO_DICT.keys():
     print(corners, ids)
 
 # Check that at least one ArUco marker was detected
-if len(corners) > 0:
+if len(corners) > 0:  # Add check for ids
     # Flatten the ArUco IDs list
     ids = ids.flatten()
 
@@ -74,8 +65,7 @@ if len(corners) > 0:
         center_y = int((top_left[1] + bottom_right[1]) / 2.0)
         cv2.circle(frame, (center_x, center_y), 4, (0, 0, 255), -1)
 
-        # Draw the ArUco marker ID on the video frame
-        # The ID is always located at the top_left of the ArUco marker
+        # Draw the ArUco marker ID on the frame
         cv2.putText(
             frame,
             str(marker_id),
@@ -86,12 +76,17 @@ if len(corners) > 0:
             2,
         )
 
-cv2.imshow("frame", frame)
-try:
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-except:
-    pass
+# Display the frame and handle window closing properly
+cv2.imshow("ArUco Markers", frame)
 
-if cv2.waitKey(1) & 0xFF == ord("q"):
-    cv2.destroyAllWindows()
+# Keep the window open until 'q' is pressed or window is closed
+while True:
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q') or cv2.getWindowProperty('ArUco Markers', cv2.WND_PROP_VISIBLE) < 1:
+        break
+
+# Cleanup
+cv2.destroyAllWindows()
+# Handle potential macOS window closing issues
+for i in range(4):
+    cv2.waitKey(1)

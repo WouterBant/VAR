@@ -241,6 +241,8 @@ class LineFollower:
 
     def get_best_line(self, lines):
         best_line = None
+        best_length = None
+        best_x = None
         best_loss = float("inf")
 
         for line in lines:

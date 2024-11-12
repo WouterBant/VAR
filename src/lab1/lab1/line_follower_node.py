@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image, CompressedImage
+from sensor_msgs.msg import CompressedImage
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
 from lab1.line_follower import LineFollower
