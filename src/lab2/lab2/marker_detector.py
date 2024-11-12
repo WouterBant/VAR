@@ -30,7 +30,10 @@ class MarkerDetectorNode(Node):
         self.marker_detector = MarkerDetection(config=self.config)
 
         self.image_sub = self.create_subscription(
-            CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10  # TODO maybe one
+            CompressedImage,
+            "/rae/right/image_raw/compressed",
+            self.image_callback,
+            10,  # TODO maybe one
         )
 
     def image_callback(self, msg):

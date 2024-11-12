@@ -29,8 +29,8 @@ class LineFollower:
             )
             # undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
             map1, map2 = cv2.initUndistortRectifyMap(
-            K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2
-        )
+                K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2
+            )
             undistorted = cv2.remap(img, map1, map2, cv2.INTER_LANCZOS4)
 
         elif model == "thin_prism":
@@ -39,18 +39,23 @@ class LineFollower:
             )
             scale_factor = 1.0
             scaled_K = K.copy()
-            scaled_K[0,0] *= scale_factor
-            scaled_K[1,1] *= scale_factor
+            scaled_K[0, 0] *= scale_factor
+            scaled_K[1, 1] *= scale_factor
             scaled_new_camera_matrix = new_camera_matrix.copy()
-            scaled_new_camera_matrix[0,0] *= scale_factor
-            scaled_new_camera_matrix[1,1] *= scale_factor
-            
+            scaled_new_camera_matrix[0, 0] *= scale_factor
+            scaled_new_camera_matrix[1, 1] *= scale_factor
+
             map1, map2 = cv2.initUndistortRectifyMap(
-                scaled_K, dist_coeffs, None, scaled_new_camera_matrix, 
-                (int(w * scale_factor), int(h * scale_factor)), cv2.CV_32FC1
+                scaled_K,
+                dist_coeffs,
+                None,
+                scaled_new_camera_matrix,
+                (int(w * scale_factor), int(h * scale_factor)),
+                cv2.CV_32FC1,
             )
-            undistorted = cv2.remap(img, map1, map2, cv2.INTER_LANCZOS4,
-                               borderMode=cv2.BORDER_REFLECT_101)
+            undistorted = cv2.remap(
+                img, map1, map2, cv2.INTER_LANCZOS4, borderMode=cv2.BORDER_REFLECT_101
+            )
         else:
             raise ValueError(
                 "Invalid rectification model. Choose 'default', 'rational', or 'thin_prism'."
@@ -244,7 +249,10 @@ class LineFollower:
             angle = abs(np.degrees(np.arctan2(y2 - y1, x2 - x1)))
             x = x1 if y1 < y2 else x2
             distance_to_previous_line = abs(x - self.last_x)
-            if self.config.get("loss") == "distance" or self.config.get("loss") == "distanceLength":
+            if (
+                self.config.get("loss") == "distance"
+                or self.config.get("loss") == "distanceLength"
+            ):
                 loss = distance_to_previous_line
             elif self.config.get("loss") == "length":
                 loss = -length
@@ -256,7 +264,12 @@ class LineFollower:
                 <= self.config.get("filter_high_angle")
                 and loss < best_loss
             ):
-                if best_line is not None and self.config.get("loss") == "distanceLength" and abs(best_x - x) < 20 and length < best_length:
+                if (
+                    best_line is not None
+                    and self.config.get("loss") == "distanceLength"
+                    and abs(best_x - x) < 20
+                    and length < best_length
+                ):
                     continue
                 best_loss = loss
                 best_line = line
@@ -492,4 +505,4 @@ class LineFollower:
         #     self.save_action_on_best_line(action, result, best_line)
         # self.frame += 1
 
-        return (0,0)
+        return (0, 0)

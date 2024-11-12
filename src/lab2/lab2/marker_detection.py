@@ -1,5 +1,6 @@
 import cv2
 
+
 class MarkerDetection:
     def __init__(self, config):
         self.config = config
@@ -9,7 +10,9 @@ class MarkerDetection:
     def detect(self, image):
         print("yo")
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, self.aruco_dict, parameters=self.aruco_params)
+        corners, ids, _ = cv2.aruco.detectMarkers(
+            gray, self.aruco_dict, parameters=self.aruco_params
+        )
         print(ids)
         if self.config.get("debug") > 0:
             if ids is not None:
