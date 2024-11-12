@@ -28,5 +28,11 @@ Run with:
 ros2 run lab1 line_follower
 ```
 
-# Lab2:
-Note: ros2 pkg create --build-type ament_python --node-name my_node lab2 in the src folder
+## Lab2:
+Build with:
+```bash
+colcon build --packages-select lab2
+```
+
+## Lab 3:
+Note: ros2 pkg create --build-type ament_python --node-name my_node lab3 in the src folder
