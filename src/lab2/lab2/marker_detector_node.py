@@ -5,7 +5,9 @@ import yaml
 import cv2
 import numpy as np
 from .marker_detection import MarkerDetection
+from .localization import Localization
 from sensor_msgs.msg import CompressedImage
+from collections import deque as Deque
 
 
 class MarkerDetectorNode(Node):
@@ -28,6 +30,7 @@ class MarkerDetectorNode(Node):
             self.config = yaml.safe_load(file)
 
         self.marker_detector = MarkerDetection(config=self.config)
+        self.localization = Localization(config=self.config)
 
         self.image_sub = self.create_subscription(
             CompressedImage,
@@ -36,13 +39,16 @@ class MarkerDetectorNode(Node):
             10,  # TODO maybe one
         )
 
+        self.queue = Deque(maxlen=5)
+
     def image_callback(self, msg):
-        # Convert ROS Image message to OpenCV image
-        # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        print("hello")
+        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         np_arr = np.frombuffer(msg.data, np.uint8)
         cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        self.marker_detector.detect(cv_image)
+        distances, coordinates = self.marker_detector.detect(cv_image)
+        location = self.localization.triangulate(distances, coordinates)
+        self.queue.append(location)
+        
 
 
 def main(args=None):
