@@ -25,11 +25,18 @@ all_corners, all_marker_ids = [], []
 for desired_aruco_dictionary in ARUCO_DICT.keys():
   # Load the desired ArUco dictionary
     this_aruco_dictionary = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[desired_aruco_dictionary])
-    this_aruco_parameters = cv2.aruco.DetectorParameters(
-        
-    )
+    this_aruco_parameters = cv2.aruco.DetectorParameters()
+    # import code; code.interact(local=dict(globals(), **locals()))
+    # 
+    this_aruco_parameters.adaptiveThreshWinSizeMin = 3
+    this_aruco_parameters.adaptiveThreshWinSizeMin = 5
+    this_aruco_parameters.adaptiveThreshWinSizeMax = 21
+    this_aruco_parameters.adaptiveThreshWinSizeStep = 4
+    this_aruco_parameters.minMarkerPerimeterRate = 0.07
+    # this_aruco_parameters.minMarkerPerimeterRate = 0.01
+    # this_aruco_parameters.maxMarkerPerimeterRate = 4.0
 
-    (corners, ids, rejected) = cv2.aruco.detectMarkers(
+    (corners, ids, rejected) = cv2.aruco.detectMarkers(  # TODO maybe use rejected
         frame, this_aruco_dictionary, parameters=this_aruco_parameters)
     all_corners.append(corners)
     all_marker_ids.append(ids)
@@ -70,7 +77,12 @@ if len(corners) > 0:
         cv2.FONT_HERSHEY_SIMPLEX,
         0.5, (0, 255, 0), 2)
 
-cv2.imshow('frame',frame)
-cv2.waitKey(0)
-# if cv2.waitKey(1) & 0xFF == ord('q'):
-#     cv2.destroyAllWindows()
+cv2.imshow('frame', frame)
+try:
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+except:
+    pass
+
+if cv2.waitKey(1) & 0xFF == ord('q'):
+    cv2.destroyAllWindows()
