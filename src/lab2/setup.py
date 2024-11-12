@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_node = lab2.my_node:main'
+            'marker_detector = lab2.marker_detector:main'
         ],
     },
 )

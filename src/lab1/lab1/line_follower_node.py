@@ -46,7 +46,7 @@ class LineFollowerNode(Node):
             CompressedImage, "/rae/right/image_raw/compressed", self.image_callback, 10  # TODO maybe one
         )
 
-        self.timer = self.create_timer(0.8, self.timer_callback)
+        # self.timer = self.create_timer(0.8, self.timer_callback)
 
         self.queue = Deque(maxlen=5)
         self.bridge = CvBridge()

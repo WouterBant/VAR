@@ -434,62 +434,62 @@ class LineFollower:
             plt.imsave(f"video/initial_image_{self.frame}.png", img)
 
         # undistort image
-        if self.config.get("undistort_image"):
-            img = self._undistort_image(img)
+        # if self.config.get("undistort_image"):
+        #     img = self._undistort_image(img)
 
-        if self.config.get("debug") > 3:
-            self.display_image("Original Image", img)
+        # if self.config.get("debug") > 3:
+        #     self.display_image("Original Image", img)
 
-        # crop image to roi to avoid having to deal with unimportant lines
-        img = self.crop_to_top_roi(img)
-        img = self.crop_sides(img)
-        img_cropped = img.copy()
+        # # crop image to roi to avoid having to deal with unimportant lines
+        # img = self.crop_to_top_roi(img)
+        # img = self.crop_sides(img)
+        # img_cropped = img.copy()
 
-        # binarize
-        img = self.convert_to_gray(img)
-        img = self.binarize_image(img)
+        # # binarize
+        # img = self.convert_to_gray(img)
+        # img = self.binarize_image(img)
 
-        # blur and dilate to remove noise and fill gaps in the
-        if self.config.get("blur_image", False):
-            img = self.blur_image(img)
-        if self.config.get("dilate_image", False):
-            img = self.dilate_image(img)
+        # # blur and dilate to remove noise and fill gaps in the
+        # if self.config.get("blur_image", False):
+        #     img = self.blur_image(img)
+        # if self.config.get("dilate_image", False):
+        #     img = self.dilate_image(img)
 
-        # edge detection
-        if self.config.get("method") == "canny":
-            edges = self.canny_edge_detection(img)
-        elif self.config.get("method") == "sobel":
-            edges = self.sobel_edge_detection(img)
+        # # edge detection
+        # if self.config.get("method") == "canny":
+        #     edges = self.canny_edge_detection(img)
+        # elif self.config.get("method") == "sobel":
+        #     edges = self.sobel_edge_detection(img)
 
-        if self.config.get("enhance_vertical_edges"):
-            edges = self.enhance_vertical_edges(img)
+        # if self.config.get("enhance_vertical_edges"):
+        #     edges = self.enhance_vertical_edges(img)
 
-        # hough transform
-        lines = self.hough_transform(edges)
+        # # hough transform
+        # lines = self.hough_transform(edges)
 
-        # get the best line
-        if self.last_x is None:
-            self.last_x = img_cropped.shape[1] // 2
-        best_line = self.get_best_line(lines)
+        # # get the best line
+        # if self.last_x is None:
+        #     self.last_x = img_cropped.shape[1] // 2
+        # best_line = self.get_best_line(lines)
 
-        if self.config.get("debug") > 3 and best_line is not None:
-            result = self.draw_lines(img_cropped, lines)
-            self.display_image("Detected Lines", result)
+        # if self.config.get("debug") > 3 and best_line is not None:
+        #     result = self.draw_lines(img_cropped, lines)
+        #     self.display_image("Detected Lines", result)
 
-            result = self.draw_lines(img_cropped, [best_line])
-            self.display_image("Best Line", result)
+        #     result = self.draw_lines(img_cropped, [best_line])
+        #     self.display_image("Best Line", result)
 
-        # determine the action with the best line
-        if self.config.get("easy_action"):
-            action = self.easy_action(
-                best_line, width=img.shape[1], height=img.shape[0]
-            )
-        else:
-            action = self.action(best_line)
+        # # determine the action with the best line
+        # if self.config.get("easy_action"):
+        #     action = self.easy_action(
+        #         best_line, width=img.shape[1], height=img.shape[0]
+        #     )
+        # else:
+        #     action = self.action(best_line)
 
-        if self.config.get("save_images") > 0 and best_line is not None:
-            result = self.draw_lines(img_cropped, [best_line])
-            self.save_action_on_best_line(action, result, best_line)
-        self.frame += 1
+        # if self.config.get("save_images") > 0 and best_line is not None:
+        #     result = self.draw_lines(img_cropped, [best_line])
+        #     self.save_action_on_best_line(action, result, best_line)
+        # self.frame += 1
 
-        return action
+        return (0,0)
