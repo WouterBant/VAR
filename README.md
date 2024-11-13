@@ -12,7 +12,7 @@ call install\setup.bat
 
 Code formatter / linter:
 ```
-ruff format src
+ruff format && ruff check
 ```
 
 ## Lab 1: Line Following
@@ -29,10 +29,18 @@ ros2 run lab1 line_follower
 ```
 
 ## Lab2:
+[Config file](configs/lab2/config.yaml)
+
 Build with:
 ```bash
 colcon build --packages-select lab2
 ```
+
+Run with:
+```bash
+ros2 run lab2 curling
+```
+
 
 ## Lab 3:
 Note: ros2 pkg create --build-type ament_python --node-name my_node lab3 in the src folder

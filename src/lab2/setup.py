@@ -18,6 +18,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["marker_detector = lab2.marker_detector:main"],
+        "console_scripts": ["curling = lab2.curling_node:main"],
     },
 )

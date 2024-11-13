@@ -10,7 +10,7 @@ from collections import deque as Deque
 from geometry_msgs.msg import Twist
 
 
-class MarkerDetectorNode(Node):
+class CurlingNode(Node):
     def __init__(self):
         super().__init__("marker_detector_node")
 
@@ -64,7 +64,7 @@ class MarkerDetectorNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = MarkerDetectorNode()
+    node = CurlingNode()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
