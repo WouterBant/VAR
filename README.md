@@ -16,7 +16,7 @@ ruff format src
 ```
 
 ## Lab 1: Line Following
-[Config file](configs/lab1/line_follower_config.yaml)
+[Config file](configs/lab1/config.yaml)
 
 Build with:
 ```bash

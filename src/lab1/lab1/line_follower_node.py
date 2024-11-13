@@ -26,7 +26,7 @@ class LineFollowerNode(Node):
             "..",
             "configs",
             "lab1",
-            "line_follower_config.yaml",
+            "config.yaml",
         )
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
