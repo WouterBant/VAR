@@ -8,7 +8,6 @@ MARKER_ID_2_LOCATION = {
     2: [0, 10, 5],  # Example 3D position for marker 2
 }
 
-
 class Localization:
     def __init__(self, config):
         self.config = config
