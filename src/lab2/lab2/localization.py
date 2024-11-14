@@ -6,7 +6,9 @@ from .consts import MARKER_ID_2_LOCATION
 class Localization:
     def __init__(self, config):
         self.config = config
-        self.previous_location = np.array([0, 0])  # 2D initial guess for (x, y)
+        self.previous_location = np.array(
+            [config.get("initial_x_location"), config.get("initial_y_location")]
+        )
 
     def triangulate(self, marker_detection_results):
         if len(marker_detection_results["marker_ids"]) == 0:
