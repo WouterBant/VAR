@@ -1,12 +1,6 @@
 import numpy as np
 from scipy.optimize import least_squares
-
-# Landmark positions (example coordinates; replace with actual values)
-MARKER_ID_2_LOCATION = {
-    0: [0, 0, 5],  # Example 3D position for marker 0
-    1: [10, 0, 5],  # Example 3D position for marker 1
-    2: [0, 10, 5],  # Example 3D position for marker 2
-}
+from .consts import MARKER_ID_2_LOCATION
 
 
 class Localization:
@@ -31,12 +25,14 @@ class Localization:
         initial_guess = self.previous_location
 
         # Extract 3D landmark positions and corresponding distances
-        # TODO fix this .get should not be necessary
+        assert all(
+            marker_id in MARKER_ID_2_LOCATION
+            for marker_id in marker_detection_results["marker_ids"]
+        ), "Some marker IDs are missing from MARKER_ID_2_LOCATION"
         landmarks = np.array(
-            [
-                MARKER_ID_2_LOCATION.get(marker_id, [3, 3, 3])
-                for marker_id in marker_detection_results["marker_ids"]
-            ]
+            [location.x, location.y, location.z]
+            for marker_id in marker_detection_results["marker_ids"]
+            for location in [MARKER_ID_2_LOCATION[marker_id]]
         )
         distances = np.array(marker_detection_results["marker_distances"])
 

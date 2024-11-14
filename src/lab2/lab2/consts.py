@@ -1,6 +1,18 @@
+from typing import List, Dict, Any
 from dataclasses import dataclass
+import cv2
 
-POSITIONS = [
+ARUCO_DICT = {
+    "DICT_4X4_1000": cv2.aruco.DICT_4X4_1000,
+    "DICT_5X5_1000": cv2.aruco.DICT_5X5_1000,
+    "DICT_6X6_1000": cv2.aruco.DICT_6X6_1000,
+    "DICT_7X7_1000": cv2.aruco.DICT_7X7_1000,
+    "DICT_ARUCO_ORIGINAL": cv2.aruco.DICT_ARUCO_ORIGINAL,
+    "DICT_ARUCO_MIP_36h12": cv2.aruco.DICT_ARUCO_MIP_36h12,
+    "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11,
+}
+
+POSITIONS: List[Dict[str, Any]] = [
     {"height": 23.5, "code": "36h11-16", "z": 106.5, "y": -281, "x": -502, "ids": [16]},
     {"height": 8, "code": "36h11-19", "z": 51.5, "y": -184, "x": -502, "ids": [3, 151, 19]},
     {"height": 20.5, "code": "7x7-37", "z": 98.5, "y": -95.5, "x": -502, "ids": [37, 95]},
@@ -34,7 +46,7 @@ class MarkerInfo:
     y: float
     z: float
 
-MARKER_ID_2_LOCATION = {}
+MARKER_ID_2_LOCATION: Dict[int, MarkerInfo] = {}
 for pos in POSITIONS:
     for marker_id in pos["ids"]:
         if marker_id in MARKER_ID_2_LOCATION:

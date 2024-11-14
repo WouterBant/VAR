@@ -1,23 +1,7 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-
-
-ARUCO_DICT = {
-    "DICT_4X4_1000": cv2.aruco.DICT_4X4_1000,
-    "DICT_5X5_1000": cv2.aruco.DICT_5X5_1000,
-    "DICT_6X6_1000": cv2.aruco.DICT_6X6_1000,
-    "DICT_7X7_1000": cv2.aruco.DICT_7X7_1000,
-    "DICT_ARUCO_ORIGINAL": cv2.aruco.DICT_ARUCO_ORIGINAL,
-    "DICT_ARUCO_MIP_36h12": cv2.aruco.DICT_ARUCO_MIP_36h12,
-    "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11,
-}
-
-MARKER_ID_2_SIZE = {
-    0: 0.1,
-    1: 0.1,
-    2: 0.1,
-}
+from .consts import MARKER_ID_2_LOCATION, ARUCO_DICT
 
 
 class MarkerDetection:
@@ -32,6 +16,8 @@ class MarkerDetection:
             this_aruco_dictionary = cv2.aruco.getPredefinedDictionary(
                 ARUCO_DICT[desired_aruco_dictionary]
             )
+
+            # TODO this needs to be configurable and cleaned up
             this_aruco_parameters = cv2.aruco.DetectorParameters()
             this_aruco_parameters.adaptiveThreshWinSizeMin = 3
             # this_aruco_parameters.adaptiveThreshWinSizeMax = 15
@@ -54,10 +40,8 @@ class MarkerDetection:
                 continue
 
             for marker_corner, marker_id in zip(corners, ids):
-                if marker_id is not None:
-                    marker_size = MARKER_ID_2_SIZE.get(
-                        marker_id[0], 30.0
-                    )  # TODO fix this filter out impossible ids
+                if marker_id is not None and marker_id[0] in MARKER_ID_2_LOCATION:
+                    marker_size = MARKER_ID_2_LOCATION[marker_id[0]].height
                     rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
                         marker_corner,
                         marker_size,
@@ -130,10 +114,8 @@ class MarkerDetection:
             plt.show()
         else:
             cv2.imshow("Frame", frame)
-            key = (
-                cv2.waitKey(1) & 0xFF
-            )  # Wait for 1ms to allow for frame update and get the pressed key
-            if key == ord("q"):  # Press 'q' to quit the display window
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord("q"):
                 cv2.destroyAllWindows()
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
