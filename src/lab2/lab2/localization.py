@@ -8,6 +8,7 @@ MARKER_ID_2_LOCATION = {
     2: [0, 10, 5],  # Example 3D position for marker 2
 }
 
+
 class Localization:
     def __init__(self, config):
         self.config = config
@@ -16,7 +17,7 @@ class Localization:
     def triangulate(self, marker_detection_results):
         if len(marker_detection_results["marker_ids"]) == 0:
             return self.previous_location
-        
+
         # Define the residual function with camera position constrained to z=0
         def residuals(camera_position_2d, landmarks, distances):
             # Convert the 2D camera position to a 3D point at z=0

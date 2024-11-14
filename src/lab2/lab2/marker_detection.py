@@ -46,7 +46,9 @@ class MarkerDetection:
                 frame, this_aruco_dictionary, parameters=this_aruco_parameters
             )
 
-            assert ids is None or len(corners) == len(ids), f"Number of corners and IDs do not match, corners: {len(corners)}, ids: {len(ids)}"
+            assert (
+                ids is None or len(corners) == len(ids)
+            ), f"Number of corners and IDs do not match, corners: {len(corners)}, ids: {len(ids)}"
 
             if ids is None:
                 continue
@@ -67,12 +69,22 @@ class MarkerDetection:
                             ]
                         ),
                         np.array(
-                            [-2.79797e-01, 6.43090e-02, -6.80000e-05, 1.96700e-03, 0.00000e00]
+                            [
+                                -2.79797e-01,
+                                6.43090e-02,
+                                -6.80000e-05,
+                                1.96700e-03,
+                                0.00000e00,
+                            ]
                         ),
                     )
 
-                    assert len(marker_id) == 1, f"More than one marker id detected: {marker_id}"
-                    assert len(marker_corner) == 1, f"More than one marker corner detected: {marker_corner}"
+                    assert (
+                        len(marker_id) == 1
+                    ), f"More than one marker id detected: {marker_id}"
+                    assert (
+                        len(marker_corner) == 1
+                    ), f"More than one marker corner detected: {marker_corner}"
 
                     all_corners.extend(marker_corner)
                     all_marker_ids.append(marker_id[0])
@@ -118,7 +130,9 @@ class MarkerDetection:
             plt.show()
         else:
             cv2.imshow("Frame", frame)
-            key = cv2.waitKey(1) & 0xFF  # Wait for 1ms to allow for frame update and get the pressed key
+            key = (
+                cv2.waitKey(1) & 0xFF
+            )  # Wait for 1ms to allow for frame update and get the pressed key
             if key == ord("q"):  # Press 'q' to quit the display window
                 cv2.destroyAllWindows()
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
