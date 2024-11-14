@@ -1,2 +1,6 @@
 debug: 3
 notebook_display: false
+detect_marker: false
+detect_robot: true
+show_contour_area: false 
+save_robot_detection_images: true

@@ -28,7 +28,7 @@ class CurlingNode(Node):
         self.bridge = CvBridge()
 
         self.queue = Deque(maxlen=5)
-        self.timer = self.create_timer(0.8, self.timer_callback)
+        self.timer = self.create_timer(0.1, self.timer_callback)
 
     def load_config(self):
         config_path = os.path.join(
@@ -42,6 +42,7 @@ class CurlingNode(Node):
             "lab2",
             "config.yaml",
         )
+        config_path = "/home/student/Desktop/VAR/configs/lab2/config.yaml"
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
 
@@ -49,8 +50,11 @@ class CurlingNode(Node):
         # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         np_arr = np.frombuffer(msg.data, np.uint8)
         cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        # cv2.imshow("Live Video Feed", cv_image)
+        # cv2.waitKey(1)  # Ensure the window updates properly
         action = self.pipeline(cv_image)
-        # self.queue.append(action)
+        self.queue.append(action)
 
     def timer_callback(self):
         if len(self.queue) == 0:
