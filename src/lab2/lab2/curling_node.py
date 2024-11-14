@@ -8,6 +8,7 @@ from .pipeline import PipeLine
 from sensor_msgs.msg import CompressedImage
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
+from cv_bridge import CvBridge
 
 
 class CurlingNode(Node):
@@ -24,6 +25,7 @@ class CurlingNode(Node):
         )
 
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)
+        self.bridge = CvBridge()
 
         self.queue = Deque(maxlen=5)
         self.timer = self.create_timer(0.8, self.timer_callback)
@@ -44,11 +46,11 @@ class CurlingNode(Node):
             self.config = yaml.safe_load(file)
 
     def image_callback(self, msg):
-        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         np_arr = np.frombuffer(msg.data, np.uint8)
         cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         action = self.pipeline(cv_image)
-        self.queue.append(action)
+        # self.queue.append(action)
 
     def timer_callback(self):
         if len(self.queue) == 0:

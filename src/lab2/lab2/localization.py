@@ -15,6 +15,9 @@ class Localization:
         self.previous_location = np.array([0, 0])  # 2D initial guess for (x, y)
 
     def triangulate(self, marker_detection_results):
+        if len(marker_detection_results["marker_ids"]) == 0:
+            return self.previous_location
+        
         # Define the residual function with camera position constrained to z=0
         def residuals(camera_position_2d, landmarks, distances):
             # Convert the 2D camera position to a 3D point at z=0
@@ -27,16 +30,11 @@ class Localization:
         # Use the previous location as the initial guess for optimization
         initial_guess = self.previous_location
 
-        print(marker_detection_results["marker_ids"])
-        print(marker_detection_results["marker_ids"][0])
-        print(marker_detection_results["marker_ids"][0].item())
-        print(marker_detection_results["marker_distances"])
-
         # Extract 3D landmark positions and corresponding distances
         # TODO fix this .get should not be necessary
         landmarks = np.array(
             [
-                MARKER_ID_2_LOCATION.get(marker_id[0].item(), [3, 3, 3])
+                MARKER_ID_2_LOCATION.get(marker_id, [3, 3, 3])
                 for marker_id in marker_detection_results["marker_ids"]
             ]
         )
