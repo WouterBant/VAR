@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import least_squares
-from .consts import MARKER_ID_2_LOCATION
+from consts import MARKER_ID_2_LOCATION
 
 
 class Localization:
@@ -31,13 +31,14 @@ class Localization:
             marker_id in MARKER_ID_2_LOCATION
             for marker_id in marker_detection_results["marker_ids"]
         ), "Some marker IDs are missing from MARKER_ID_2_LOCATION"
-        landmarks = np.array(
+        landmarks = np.array([
             [location.x, location.y, location.z]
             for marker_id in marker_detection_results["marker_ids"]
             for location in [MARKER_ID_2_LOCATION[marker_id]]
-        )
+        ])
         distances = np.array(marker_detection_results["marker_distances"])
 
+        print(initial_guess, landmarks, distances)
         # Perform least squares optimization to find the best (x, y) position
         result = least_squares(residuals, initial_guess, args=(landmarks, distances))
 

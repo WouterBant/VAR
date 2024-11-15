@@ -1,14 +1,21 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from .consts import MARKER_ID_2_LOCATION, ARUCO_DICT
+from consts import MARKER_ID_2_LOCATION, ARUCO_DICT
 
 
 class MarkerDetection:
     def __init__(self, config):
         self.config = config
-        self.aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_7X7_50)
-        self.aruco_params = cv2.aruco.DetectorParameters()
+        self.aruco_params = self._initialize_aruco_params()
+    
+    def _initialize_aruco_params(self):
+        aruco_params = cv2.aruco.DetectorParameters()
+        if not self.config.get("use_custom_detector_parameters"):
+            return aruco_params
+        detector_config = self.config.get("detector_parameters", {})
+        for key, value in detector_config.items():
+            setattr(aruco_params, key, value)
 
     def detect(self, frame):
         all_corners, all_marker_ids, all_distances, all_sizes = [], [], [], []
@@ -17,19 +24,8 @@ class MarkerDetection:
                 ARUCO_DICT[desired_aruco_dictionary]
             )
 
-            # TODO this needs to be configurable and cleaned up
-            this_aruco_parameters = cv2.aruco.DetectorParameters()
-            this_aruco_parameters.adaptiveThreshWinSizeMin = 3
-            # this_aruco_parameters.adaptiveThreshWinSizeMax = 15
-            # this_aruco_parameters.adaptiveThreshWinSizeStep = 4
-            # this_aruco_parameters.minMarkerPerimeterRate = 0.04
-            # this_aruco_parameters.minMarkerPerimeterRate = 0.01
-            this_aruco_parameters.maxMarkerPerimeterRate = 4.0
-            this_aruco_parameters.polygonalApproxAccuracyRate = 0.02
-            # this_aruco_parameters.minMarkerDistanceRate = 0.5
-
             (corners, ids, rejected) = cv2.aruco.detectMarkers(
-                frame, this_aruco_dictionary, parameters=this_aruco_parameters
+                frame, this_aruco_dictionary, parameters=self.aruco_params
             )
 
             assert (
