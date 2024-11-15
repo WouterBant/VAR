@@ -28,7 +28,7 @@ Run with:
 ros2 run lab1 line_follower
 ```
 
-## Lab2:
+## Lab2: Detection and Localization
 [Config file](configs/lab2/config.yaml)
 
 Build with:

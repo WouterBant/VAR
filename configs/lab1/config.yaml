@@ -1,11 +1,9 @@
-method: "bier"  # Options: "canny", "sobel", "None"
-enhance_vertical_edges: true
-blur_image: true
-dilate_image: true
-smooth_angle: true
+method: "None"  # Options: "canny", "sobel", "None"
+loss: "distanceLength"  # Options: "distanceLength", "distance", "length"
+undistort_method: "default"  # Options: "default", "rational", "thin_prism"
 smooth_lambda: 0.2
-filter_low_angle: 45  # was 65
-filter_high_angle: 135  # was 115
+filter_low_angle: 45
+filter_high_angle: 135
 binary_threshold: 240
 canny_lower: 100
 canny_upper: 150
@@ -16,10 +14,12 @@ sobel_threshold: 50
 hough_threshold: 30
 hough_min_line_length: 60
 hough_max_line_gap: 50
-loss: "distanceLength"
-undistort_image: true
-undistort_method: "default"
+blur_image: true
 easy_action: true
+dilate_image: true
+smooth_angle: true
 horizon_center: true
+undistort_image: true
+enhance_vertical_edges: true
 save_images: true 
 debug: 2
