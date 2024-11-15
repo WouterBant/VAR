@@ -1,14 +1,22 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from consts import MARKER_ID_2_LOCATION, ARUCO_DICT
+from IPython import get_ipython
+
+try:
+    if "get_ipython" in globals() and "IPKernelApp" in get_ipython().config:
+        from consts import MARKER_ID_2_LOCATION, ARUCO_DICT
+    else:
+        from .consts import MARKER_ID_2_LOCATION, ARUCO_DICT
+except AttributeError:
+    from .consts import MARKER_ID_2_LOCATION, ARUCO_DICT
 
 
 class MarkerDetection:
     def __init__(self, config):
         self.config = config
         self.aruco_params = self._initialize_aruco_params()
-    
+
     def _initialize_aruco_params(self):
         aruco_params = cv2.aruco.DetectorParameters()
         if not self.config.get("use_custom_detector_parameters"):

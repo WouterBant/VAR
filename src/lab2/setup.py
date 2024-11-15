@@ -18,6 +18,9 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["curling = lab2.curling_node:main"],
+        "console_scripts": [
+            "curling = lab2.curling_node:main",
+            "image_saver = lab2.img_saver_node:main",
+        ],
     },
 )

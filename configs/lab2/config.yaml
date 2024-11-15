@@ -1,5 +1,5 @@
 detect_marker: true
-detect_robot: true
+detect_robot: false
 show_contour_area: false 
 save_robot_detection_images: true
 initial_x_location: 0.0
@@ -7,15 +7,15 @@ initial_y_location: -4.0
 target_x_location: 0.0
 target_y_location: 4.0
 notebook_display: true
-debug: 3
+debug: 10
 
 use_custom_detector_parameters: true
 detector_parameters:
   adaptiveThreshWinSizeMin: 3
-  # adaptiveThreshWinSizeMax: 15
-  # adaptiveThreshWinSizeStep: 4
-  # minMarkerPerimeterRate: 0.04
-  # minMarkerPerimeterRate: 0.01
+  adaptiveThreshWinSizeMax: 15  # NO
+  adaptiveThreshWinSizeStep: 4  # NO
+  minMarkerPerimeterRate: 0.04  # NO 
+  minMarkerPerimeterRate: 0.01  # NO
   maxMarkerPerimeterRate: 4.0
   polygonalApproxAccuracyRate: 0.02
-  # minMarkerDistanceRate: 0.5
+  minMarkerDistanceRate: 0.5  # NO
