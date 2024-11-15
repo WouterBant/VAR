@@ -27,7 +27,7 @@ POSITIONS: List[Dict[str, Any]] = [
     {"height": 8, "code": "36h11-59", "z": 51-ROBOT_CAMERA_OFFSET, "y": 186.5, "x": -313, "ids": [14, 59]},  # gras
     {"height": 8, "code": "36h11-89", "z": 46-ROBOT_CAMERA_OFFSET, "y": 445.9, "x": -78, "ids": [89]},	#gras
     {"height": 8, "code": "36h11-99", "z": 49.5-ROBOT_CAMERA_OFFSET, "y": 445.9, "x": 80, "ids": [97, 99]},	#gras
-    {"height": 8, "code": "36h11-69", "z": 47-ROBOT_CAMERA_OFFSET, "y": 183.2, "x": 464.6, "ids": [69, 111]},	#gras
+    {"height": 8, "code": "36h11-69", "z": 47-ROBOT_CAMERA_OFFSET, "y": 183.2, "x": 364.6, "ids": [69, 111]},	#gras
     {"height": 8, "code": "36h11-79", "z": 49.3-ROBOT_CAMERA_OFFSET, "y": 454.4, "x": 408.5, "ids": [79]},	#gras
     {"height": 23.5, "code": "36h11-26", "z": 103.8-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 395, "x": 421.5, "ids": [26, 120, 181]},
     {"height": 20.5, "code": "36h12-67", "z": 95.4-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 318, "x": 421.5, "ids": [67, 439]},
