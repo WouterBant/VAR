@@ -2,6 +2,7 @@ detect_marker: true
 detect_robot: false
 show_contour_area: false 
 save_robot_detection_images: true
+undistort_method: default
 initial_x_location: 0.0
 initial_y_location: -4.0
 target_x_location: 0.0
