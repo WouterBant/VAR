@@ -207,7 +207,9 @@ class MarkerDetection:
                     all_corners.extend(marker_corner)
                     all_marker_ids.append(marker_id[0])
                     # all_distances.append(np.linalg.norm(tvecs))
-                    all_distances.append(tvecs[0][0][2])  #TODO maybe this is good or the above
+                    all_distances.append(
+                        tvecs[0][0][2]
+                    )  # TODO maybe this is good or the above
                     all_sizes.append(marker_size)
 
         if self.config.get("notebook_display"):
