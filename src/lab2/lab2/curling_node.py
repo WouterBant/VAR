@@ -28,7 +28,7 @@ class CurlingNode(Node):
         self.bridge = CvBridge()
         self.delay = 0
 
-        self.queue = Deque(maxlen=5)
+        self.queue: Deque[Twist] = Deque(maxlen=5)
         self.timer = self.create_timer(0.1, self.timer_callback)
 
     def load_config(self):
@@ -59,8 +59,8 @@ class CurlingNode(Node):
     def timer_callback(self):
         if len(self.queue) == 0:
             return
-        average_linear = sum(i for (i, _) in self.queue) / len(self.queue)
-        average_angular = sum(i for (_, i) in self.queue) / len(self.queue)
+        average_linear = sum(i.linear.x for i in self.queue) / len(self.queue)
+        average_angular = sum(i.angular.z for i in self.queue) / len(self.queue)
         self.queue.clear()
         twist_msg = Twist()
         twist_msg.linear.x = average_linear  # Forward/backward

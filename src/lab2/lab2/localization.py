@@ -18,6 +18,9 @@ class Localization:
             [config.get("initial_x_location"), config.get("initial_y_location")]
         )
 
+    def triangulate(self, marker_detection_results):
+        return self.triangulate_3d_ls(marker_detection_results)
+
     def triangulate_2d_ls(self, marker_detection_results):
         if len(marker_detection_results["marker_ids"]) == 0:
             return self.previous_location

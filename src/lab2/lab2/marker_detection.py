@@ -6,8 +6,6 @@ from IPython import get_ipython
 try:
     if "get_ipython" in globals() and "IPKernelApp" in get_ipython().config:
         from consts import MARKER_ID_2_LOCATION, ARUCO_DICT
-    else:
-        from .consts import MARKER_ID_2_LOCATION, ARUCO_DICT
 except AttributeError:
     from .consts import MARKER_ID_2_LOCATION, ARUCO_DICT
 

@@ -6,8 +6,9 @@ undistort_method: default
 initial_x_location: 0.0
 initial_y_location: -4.0
 target_x_location: 0.0
-target_y_location: 4.0
+target_y_location: 400.0
 notebook_display: true
+save_images: true
 debug: 10
 
 use_custom_detector_parameters: true
