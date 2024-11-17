@@ -6,7 +6,7 @@ undistort_method: default
 initial_x_location: 0.0
 initial_y_location: -4.0
 target_x_location: 0.0
-target_y_location: 400.0
+target_y_location: 450.0
 notebook_display: true
 save_images: true
 debug: 10
@@ -21,3 +21,9 @@ detector_parameters:
   maxMarkerPerimeterRate: 4.0
   polygonalApproxAccuracyRate: 0.02
   minMarkerDistanceRate: 0.5  # NO
+
+max_linear_speed: 1.5
+max_angular_speed: 1.0
+position_tolerance: 0.1
+danger_slow_factor: 0.3
+escape_turn_speed: 0.75

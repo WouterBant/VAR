@@ -58,8 +58,6 @@ class PipeLine:
         )  # TODO false, set should be replaced by the output of robot detector
         if self.config.get("save_images"):
             self.save_movement_image(cv_image, cmd)
-            print("hello")
-        print("hi")
         self.frame_nmbr += 1
         return cmd
 
@@ -67,8 +65,8 @@ class PipeLine:
         os.makedirs("movement_images", exist_ok=True)
         title = (
             f"Linear: {cmd.linear.x:.2f}, "
-            f"Angular: {cmd.angular.z:.2f}, "
-            f"Current Position: {self.localization.previous_location}, "
+            f"Angular: {cmd.angular.z:.2f},\n"
+            f"Current Position: {self.localization.previous_location},\n"
             f"Target Position: ({self.config.get('target_x_location')}, {self.config.get('target_y_location')})"
         )
         print(title)
@@ -100,7 +98,7 @@ class PipeLine:
 
         canvas[len(wrapped) * line_h :] = cv_image
         cv2.imwrite(
-            f"movement_images/movement_{cmd.linear.x:.2f}_{cmd.angular.z:.2f}.png",
+            f"movement_images/movement_{self.frame_nmbr}.png",
             canvas,
         )
 
