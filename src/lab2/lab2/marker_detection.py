@@ -231,7 +231,7 @@ class MarkerDetection:
         # increase contrast in frame
         # frame = cv2.convertScaleAbs(frame, alpha=2.0, beta=1)  # 3, 0 works
         # frame = self._undistort_image(frame)
-        all_corners, all_marker_ids, all_distances, all_sizes, all_tvecs = [], [], [], [], []
+        all_corners, all_marker_ids, all_distances, all_sizes, all_tvecs, all_rvecs = [], [], [], [], [], []
         for desired_aruco_dictionary in ARUCO_DICT.keys():
             this_aruco_dictionary = cv2.aruco.getPredefinedDictionary(
                 ARUCO_DICT[desired_aruco_dictionary]
@@ -291,10 +291,11 @@ class MarkerDetection:
                     all_corners.extend(marker_corner)
                     all_marker_ids.append(marker_id[0])
                     all_tvecs.append(tvecs[0][0])
-                    # all_distances.append(np.linalg.norm(tvecs))
-                    all_distances.append(
-                        tvecs[0][0][2]
-                    )  # TODO maybe this is good or the above
+                    all_distances.append(np.linalg.norm(tvecs))  # TODO this seems to work better
+                    all_rvecs.append(rvecs[0][0])
+                    # all_distances.append(
+                        # tvecs[0][0][2]
+                    # )  # TODO maybe this is good or the above
                     all_sizes.append(marker_size)
 
         if self.config.get("notebook_display"):
@@ -348,4 +349,5 @@ class MarkerDetection:
             "marker_sizes": all_sizes,
             "frame": rgb_frame,
             "tvecs": all_tvecs,
+            "rvecs": all_rvecs,
         }

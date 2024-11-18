@@ -1,13 +1,13 @@
 detect_marker: true
 detect_robot: false
-show_contour_area: false 
+show_contour_area: false
 save_robot_detection_images: true
 undistort_method: default
 initial_x_location: 0.0
 initial_y_location: -4.0
 target_x_location: 0.0
 target_y_location: 450.0
-notebook_display: false
+notebook_display: true
 save_images: true
 debug: 10
 print_wheel_values: true
