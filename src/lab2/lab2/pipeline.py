@@ -44,7 +44,9 @@ class PipeLine:
                 )
 
         if self.config.get("detect_robot"):
-            img, mask = self.robot_detector.detect(cv_image)
+            # Empty lists when no object has been detected
+            # Else e.g in_dangers = [False, True, False] and approx_distances = [3, 1.5, 4] (cm's)
+            in_dangers, approx_distances = self.robot_detector.detect(cv_image)
 
             if self.config.get("debug") > 2:
                 print(f"Robot detection: {img}, {mask}")
@@ -56,7 +58,7 @@ class PipeLine:
 
         # inDanger, distances = False, None
         # if self.config.get("avoid_obstacles"):
-        #     inDanger, distances = self.object_detector.detect(cv_image)
+        #     in_dangers, approx_distances = self.object_detector.detect(cv_image)
         cmd = self.movement_controller.move_to_target(
             location, (False, set()), pose
         )  # TODO false, set should be replaced by the output of robot detector
