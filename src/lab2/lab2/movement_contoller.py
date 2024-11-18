@@ -21,7 +21,7 @@ class MovementController:
             "escape_turn_speed"
         )  # rad/s for escape maneuvers
 
-    def move_to_target(self, current_pos, obstacle_detection: Tuple[bool, Set[str]]):
+    def move_to_target(self, current_pos, obstacle_detection: Tuple[bool, Set[str]], pose: float):
         """
         Move robot towards target position while avoiding obstacles
 
@@ -48,8 +48,14 @@ class MovementController:
             use_angle = (correct_angle - 90) * -1
         else:
             use_angle = 90 - correct_angle
-        use_angle /= 180
         print(f"Use angle: {use_angle}")
+
+        # Use angle assumes that the robot is parallel with x=0 axis
+        # So incorporate the pose now
+        use_angle += pose
+        print(f"Pose corrected angle: {use_angle}")
+
+        use_angle /= 180
         # TODO take into current orientation of the robot, currently this want to drive from the front of the target
         # TODO make sure that if no target is detected the robot will not go circles but goes straight
 
@@ -67,7 +73,6 @@ class MovementController:
         else:
             # Normal operation with cautious checking
             cmd = self._normal_movement(distance, target_angle, danger_positions)
-
         return cmd
 
     def _handle_danger(self, danger_positions: Set[str], target_angle: float) -> Twist:
@@ -118,13 +123,13 @@ class MovementController:
         if len(danger_positions) > 0:
             cmd.linear.x *= self.danger_slow_factor
         cmd.angular.z = self._get_angular_velocity(target_angle)
-        print(f"Linear: {cmd.linear.x}, Angular: {cmd.angular.z}")
 
         # Ensure we're not exceeding max speeds
         cmd.linear.x = min(cmd.linear.x, self.max_linear_speed)
         cmd.angular.z = max(
             min(cmd.angular.z, self.max_angular_speed), -self.max_angular_speed
         )
+        print(f"Linear: {cmd.linear.x}, Angular: {cmd.angular.z}")
 
         return cmd
 

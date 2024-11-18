@@ -21,6 +21,7 @@ class MarkerDetection:
             return aruco_params
         detector_config = self.config.get("detector_parameters", {})
         for key, value in detector_config.items():
+            print(f"Setting {key} to {value}")
             setattr(aruco_params, key, value)
 
     def undistort_image(self, img, K, dist_coeffs, model="default"):
@@ -149,12 +150,88 @@ class MarkerDetection:
                 model="thin_prism",
             )
         return img
+    
+    # def get_camera_direction(self, rvecs, tvecs):
+    #     # Convert rotation vector to rotation matrix
+    #     rmat, _ = cv2.Rodrigues(rvecs[0])
+        
+    #     # The third column of the rotation matrix represents the camera's forward direction
+    #     # in world coordinates
+    #     print(rmat.T)
+    #     forward_direction = rmat[:, 2]
+        
+    #     # Calculate yaw angle (rotation around Y axis) from the forward direction
+    #     # Using arctangent of x/z components
+    #     yaw = np.degrees(np.arctan2(-forward_direction[0], -forward_direction[2]))
+        
+    #     return yaw
+
+    def get_camera_direction(self, rvecs, tvecs):
+        # Convert rotation vector to rotation matrix
+        rmat, _ = cv2.Rodrigues(rvecs[0])
+        
+        # Get Euler angles (pitch, yaw, roll)
+        euler_angles = -cv2.decomposeProjectionMatrix(np.hstack((rmat, np.zeros((3,1)))))[6]
+        
+        # Get yaw (rotation around y-axis)
+        yaw = euler_angles[1][0]  # Take the yaw angle
+        
+        # Normalize to -180 to 180 range
+        if yaw > 180:
+            yaw -= 360
+        
+        return yaw
+
+    def get_camera_angles(self, rvecs):
+        # Convert rotation vector to rotation matrix
+        rmat, _ = cv2.Rodrigues(rvecs[0])
+        
+        # Get Euler angles in degrees (pitch, yaw, roll)
+        euler_angles = -cv2.decomposeProjectionMatrix(np.hstack((rmat, np.zeros((3,1)))))[6]
+        
+        # Extract each angle
+        pitch = euler_angles[0][0]  # X-axis rotation (up/down tilt)
+        yaw = euler_angles[1][0]    # Y-axis rotation (left/right direction)
+        roll = euler_angles[2][0]   # Z-axis rotation (tilt sideways)
+        
+        # Normalize angles to -180 to 180 range
+        for angle in [pitch, yaw, roll]:
+            if angle > 180:
+                angle -= 360
+                
+        return pitch, yaw, roll
+
+    def get_global_viewing_angle(self, robot_position, marker_position):
+        """
+        Calculate viewing angle in global coordinate system
+        
+        Args:
+            robot_position: (x, y) tuple of robot's position in global coordinates
+            marker_position: (x, y) tuple of marker's known position in global coordinates
+        
+        Returns:
+            angle in degrees (-180 to 180) in global coordinate system
+        """
+        # Get direction vector from robot to marker
+        dx = marker_position[0] - robot_position[0]
+        dy = marker_position[1] - robot_position[1]
+        
+        # Calculate angle using arctan2 (handles all quadrants correctly)
+        angle = np.degrees(np.arctan2(dy, dx))
+        
+        # Normalize to -180 to 180 range
+        if angle > 180:
+            angle -= 360
+        elif angle < -180:
+            angle += 360
+            
+        return angle
 
     def detect(self, frame):
         # increase contrast in frame
-        frame = cv2.convertScaleAbs(frame, alpha=3.0, beta=1)  # 3, 0 works
+        # frame = cv2.convertScaleAbs(frame, alpha=2.0, beta=1)  # 3, 0 works
         # frame = self._undistort_image(frame)
-        all_corners, all_marker_ids, all_distances, all_sizes = [], [], [], []
+        all_corners, all_marker_ids, all_distances, all_sizes, all_tvecs = [], [], [], [], []
         for desired_aruco_dictionary in ARUCO_DICT.keys():
             this_aruco_dictionary = cv2.aruco.getPredefinedDictionary(
                 ARUCO_DICT[desired_aruco_dictionary]
@@ -195,6 +272,11 @@ class MarkerDetection:
                         ),
                     )
 
+                    print(rvecs.shape, tvecs.shape, marker_corner.shape)
+                    print(tvecs)
+                    print(self.get_camera_direction(rvecs, tvecs), "eeeeeee")
+                    print(self.get_camera_angles(rvecs), "fffffffffff")
+
                     assert (
                         len(marker_id) == 1
                     ), f"More than one marker id detected: {marker_id}"
@@ -202,8 +284,13 @@ class MarkerDetection:
                         len(marker_corner) == 1
                     ), f"More than one marker corner detected: {marker_corner}"
 
+                    if abs(tvecs[0][0][1]) > 120:
+                        print(f"skipping marker {marker_id[0]}")
+                        continue
+
                     all_corners.extend(marker_corner)
                     all_marker_ids.append(marker_id[0])
+                    all_tvecs.append(tvecs[0][0])
                     # all_distances.append(np.linalg.norm(tvecs))
                     all_distances.append(
                         tvecs[0][0][2]
@@ -260,4 +347,5 @@ class MarkerDetection:
             "marker_distances": all_distances,
             "marker_sizes": all_sizes,
             "frame": rgb_frame,
+            "tvecs": all_tvecs,
         }

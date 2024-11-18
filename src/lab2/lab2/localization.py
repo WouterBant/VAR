@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from scipy.optimize import least_squares
 from IPython import get_ipython
 
@@ -17,9 +18,18 @@ class Localization:
         self.previous_location = np.array(
             [config.get("initial_x_location"), config.get("initial_y_location")]
         )
+        self.previous_pose = 0
 
     def triangulate(self, marker_detection_results):
-        return self.triangulate_3d_ls(marker_detection_results)
+        if len(marker_detection_results["marker_ids"]) == 0:
+            return self.previous_location, self.previous_pose
+        position = self.triangulate_2d_ls(marker_detection_results)
+        poses = self.estimate_pose(marker_detection_results, position)
+        print("poses", poses)
+        if len(poses) == 0:  # TODO now we have already updated previous position
+            return position, self.previous_pose
+        average_pose = sum(poses) / len(poses)
+        return position, average_pose
 
     def triangulate_2d_ls(self, marker_detection_results):
         if len(marker_detection_results["marker_ids"]) == 0:
@@ -40,6 +50,8 @@ class Localization:
             ]
         )
 
+        print(marker_detection_results["marker_distances"])
+        print([MARKER_ID_2_LOCATION[marker_id].z for marker_id in marker_detection_results["marker_ids"]])
         distances = np.array(
             [
                 np.sqrt(distance**2 - MARKER_ID_2_LOCATION[marker_id].z ** 2)
@@ -62,10 +74,44 @@ class Localization:
         self.previous_location = result.x
         return result.x
 
-    def triangulate_3d_ls(self, marker_detection_results):
-        if len(marker_detection_results["marker_ids"]) == 0:
-            return self.previous_location
+    def estimate_pose(self, marker_detection_results, location):
+        estimated_poses = list()
+        for i in range(len(marker_detection_results["marker_ids"])):
+            marker_id = marker_detection_results["marker_ids"][i]
+            distance = marker_detection_results["marker_distances"][i]
+            tvec = marker_detection_results["tvecs"][i]
+            # TODO make sure it also works on left side
+            marker_location = MARKER_ID_2_LOCATION[marker_id]
+            distance_ground = np.sqrt(distance**2 - marker_location.z ** 2)
+            delta_x = abs(location[0] - marker_location.x)
+            delta_y = abs(location[1] - marker_location.y)
+            if marker_location.y > location[1]:
+                initial_angle = 90 + math.degrees(math.atan2(delta_x, delta_y))
+            else:
+                initial_angle = 270 - math.degrees(math.atan2(delta_x, delta_y))
+            print(initial_angle, "initial")
+            print(tvec, "tvec")
+            print(distance_ground, "distance_ground")
+            if abs(tvec[0]) > distance_ground:  # TODO this is hacky
+                print("skipping invalid marker location")
+                continue
+            adjustment_angle = math.degrees(math.asin(abs(tvec[0]) / distance_ground))
+            print(adjustment_angle, "adjustment")
+            if (tvec[0] > 0 and location[0] > 0) or (tvec[0] < 0 and location[0] < 0):
+                angle = initial_angle - adjustment_angle
+            else:
+                angle = initial_angle + adjustment_angle
+            print(angle, "correct")
+            if location[0] < 0:
+                angle *= -1
+            if angle < 0:
+                angle += 90
+            else:
+                angle -= 90
+            estimated_poses.append(angle)
+        return estimated_poses
 
+    def triangulate_3d_ls(self, marker_detection_results):
         def residuals(camera_position_2d, landmarks, distances):
             camera_position = np.array(
                 [camera_position_2d[0], camera_position_2d[1], 0]
@@ -99,6 +145,11 @@ class Localization:
         )
 
         self.previous_location = result.x
+
+        # now that we have location, estimate pose
+        poses = self.estimate_pose(marker_detection_results, result.x)
+        print(poses, "poses")
+
         return result.x
 
     def triangulate_exact(self, marker_detection_results):

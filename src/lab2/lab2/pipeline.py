@@ -30,9 +30,11 @@ class PipeLine:
     def run(self, cv_image):
         if self.config.get("detect_marker"):
             marker_detection_results = self.marker_detector.detect(cv_image)
-            location = self.localization.triangulate(marker_detection_results)
+            location, pose = self.localization.triangulate(marker_detection_results)
+
             if self.config.get("debug") > 2:
                 print(f"Location: {location}")
+
             if self.config.get("save_images"):
                 os.makedirs("marker_images", exist_ok=True)
                 frame = marker_detection_results["frame"]
@@ -43,8 +45,10 @@ class PipeLine:
 
         if self.config.get("detect_robot"):
             img, mask = self.robot_detector.detect(cv_image)
+
             if self.config.get("debug") > 2:
                 print(f"Robot detection: {img}, {mask}")
+
             if self.config.get("save_images"):
                 os.makedirs("robot_images", exist_ok=True)
                 cv2.imwrite(f"robot_images/{self.frame_nmbr}.jpg", img)
@@ -54,7 +58,7 @@ class PipeLine:
         # if self.config.get("avoid_obstacles"):
         #     inDanger, distances = self.object_detector.detect(cv_image)
         cmd = self.movement_controller.move_to_target(
-            location, (False, set())
+            location, (False, set()), pose
         )  # TODO false, set should be replaced by the output of robot detector
         if self.config.get("save_images"):
             self.save_movement_image(cv_image, cmd)
@@ -69,7 +73,6 @@ class PipeLine:
             f"Current Position: {self.localization.previous_location},\n"
             f"Target Position: ({self.config.get('target_x_location')}, {self.config.get('target_y_location')})"
         )
-        print(title)
         font, font_scale, thickness = cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1
         title = (
             f"Linear: {cmd.linear.x:.2f}, Angular: {cmd.angular.z:.2f}, "

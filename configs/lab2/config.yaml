@@ -13,14 +13,20 @@ debug: 10
 
 use_custom_detector_parameters: true
 detector_parameters:
-  adaptiveThreshWinSizeMin: 3
+  adaptiveThreshWinSizeMin: 1
   adaptiveThreshWinSizeMax: 15  # NO
   adaptiveThreshWinSizeStep: 4  # NO
-  minMarkerPerimeterRate: 0.04  # NO 
   minMarkerPerimeterRate: 0.01  # NO
+  minMarkerLengthRatioOriginalImg: 0.001
+  minCornerDistanceRate: 0.02
   maxMarkerPerimeterRate: 4.0
   polygonalApproxAccuracyRate: 0.02
   minMarkerDistanceRate: 0.5  # NO
+  errorCorrectionRate: 0.8 
+  maxErroneousBitsInBorderRate: 0.4
+  markerBorderBits: 2
+  aprilTagQuadDecimate: 1.0
+  aprilTagQuadSigma: 0.5
 
 max_linear_speed: 1.5
 max_angular_speed: 1.0

@@ -40,7 +40,7 @@ POSITIONS: List[Dict[str, Any]] = [
     {"height": 20.5, "code": "36h12-57", "z": 100-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [57]},	
     {"height": 23.5, "code": "36h11-46", "z": 165.6-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [46]},
     {"height": 20.5, "code": "7x7-7", "z": 97.5-ROBOT_CAMERA_OFFSET, "y": 553.2, "x": -48, "ids": [7]},  # gras	
-    {"height": 8, "code": "36h11-56", "z": 164-ROBOT_CAMERA_OFFSET, "y": 553.2, "x": -48, "ids": [4, 56]},  # gras
+    {"height": 23.5, "code": "36h11-56", "z": 164-ROBOT_CAMERA_OFFSET, "y": 553.2, "x": -48, "ids": [4, 56]},  # gras
 ]
 
 @dataclass
