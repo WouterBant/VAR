@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from .pipeline import PipeLine
 from sensor_msgs.msg import CompressedImage
+from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
@@ -23,6 +24,16 @@ class CurlingNode(Node):
             self.image_callback,
             10,
         )
+
+        self.joint_state_sub = self.create_subscription(
+            DynamicJointState,
+            "/dynamic_joint_states",
+            self.joint_state_callback,
+            10,
+        )
+
+        self.left_wheel_value = None
+        self.right_wheel_value = None
 
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)
         self.bridge = CvBridge()
@@ -43,6 +54,7 @@ class CurlingNode(Node):
             "lab2",
             "config.yaml",
         )
+        config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
 
@@ -56,7 +68,21 @@ class CurlingNode(Node):
         action = self.pipeline(cv_image)
         self.queue.append(action)
 
+    def joint_state_callback(self, msg):
+        joint_data = {
+            joint_name: interface.values
+            for joint_name, interface in zip(msg.joint_names, msg.interface_values)
+        }
+
+        self.left_wheel_value = joint_data.get("left_wheel_joint", None)
+        self.right_wheel_value = joint_data.get("right_wheel_joint", None)
+
     def timer_callback(self):
+        if self.config["print_wheel_values"]:
+            if self.left_wheel_value and self.right_wheel_value:
+                print(f"Left Wheel - Value: {self.left_wheel_value[0]}")
+                print(f"Right Wheel - Value: {self.right_wheel_value[0]}")
+                
         if len(self.queue) == 0:
             return
         average_linear = sum(i.linear.x for i in self.queue) / len(self.queue)
