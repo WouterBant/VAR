@@ -72,7 +72,7 @@ class LiveMap:
             "lab2",
             "config.yaml",
         )
-        config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
+        # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
 
