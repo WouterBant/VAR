@@ -19,6 +19,9 @@ class MarkerDetection:
 
     def _initialize_aruco_params(self):
         aruco_params = cv2.aruco.DetectorParameters()
+        aruco_params.adaptiveThreshWinSizeMin = 3
+        aruco_params.maxMarkerPerimeterRate = 4.0
+        aruco_params.polygonalApproxAccuracyRate = 0.04
         if not self.config.get("use_custom_detector_parameters"):
             return aruco_params
         detector_config = self.config.get("detector_parameters", {})

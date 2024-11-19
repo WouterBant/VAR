@@ -103,7 +103,7 @@ class Localization:
 
             if self.config["debug"] > 6:
                 print(location, "location robot")
-                print(MARKER_ID_2_LOCATION[marker_id], "locatino target")
+                print(MARKER_ID_2_LOCATION[marker_id], "location target")
                 print(f"deltax: {delta_x}, deltay: {delta_y}")
 
             if location[1] < MARKER_ID_2_LOCATION[marker_id].y:
