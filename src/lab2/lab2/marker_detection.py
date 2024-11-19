@@ -232,21 +232,21 @@ class MarkerDetection:
             angle += 360
 
         return angle
-    
+
     def super_resolve_image(input_image, scale_factor=2):
         """
         Perform image superresolution using OpenCV's DNN-based super-resolution model
-        
+
         Args:
             input_image (numpy.ndarray): Input low-resolution image
             scale_factor (int): Upscaling factor (default is 2x)
-        
+
         Returns:
             numpy.ndarray: Superresolved high-resolution image
         """
         # Load the pre-trained EDSR model for superresolution
         model = cv2.dnn_superres.DnnSuperResImpl_create()
-        
+
         # Available models in OpenCV:
         # - EDSR x2
         # - EDSR x3
@@ -257,18 +257,18 @@ class MarkerDetection:
         # - FSRCNN x2
         # - FSRCNN x3
         # - FSRCNN x4
-        model_path = f'EDSR_x{scale_factor}.pb'
-        
+        model_path = f"EDSR_x{scale_factor}.pb"
+
         try:
             # Load the model
             model.readModel(model_path)
             model.setModel("edsr", scale_factor)
-            
+
             # Perform superresolution
             sr_image = model.upsample(input_image)
-            
+
             return sr_image
-        
+
         except Exception as e:
             print(f"Error in superresolution: {e}")
             return input_image
@@ -295,7 +295,7 @@ class MarkerDetection:
         # frame = cv2.bitwise_not(frame)
         # frame = cv2.convertScaleAbs(frame, alpha=1.5, beta=20)
 
-        kernel = np.array([[0, -1, 0], [-1, 5,-1], [0, -1, 0]]) / 2
+        kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]) / 2
         for _ in range(0):
             frame = cv2.filter2D(frame, -1, kernel)
         all_corners, all_marker_ids, all_distances, all_sizes, all_tvecs, all_rvecs = (
@@ -322,13 +322,16 @@ class MarkerDetection:
             if ids is None:
                 continue
 
-            K = np.array(
-                [
-                    [290.46301, 0.0, 312.90291],
-                    [0.0, 290.3703, 203.01488],
-                    [0.0, 0.0, 1.0],
-                ]
-            )*resize_factor
+            K = (
+                np.array(
+                    [
+                        [290.46301, 0.0, 312.90291],
+                        [0.0, 290.3703, 203.01488],
+                        [0.0, 0.0, 1.0],
+                    ]
+                )
+                * resize_factor
+            )
             K[2, 2] = 1.0
 
             for marker_corner, marker_id in zip(corners, ids):

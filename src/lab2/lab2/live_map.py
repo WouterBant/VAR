@@ -3,6 +3,7 @@ import cv2
 import os
 import yaml
 
+
 class LiveMap:
     def __init__(self, image_path):
         # Load config
@@ -10,16 +11,22 @@ class LiveMap:
 
         # Set up the map with a desired size
         self.map_size = (600, 900)  # Map size (width x height in cm)
-        
+
         # Create a figure and axes for plotting
         aspect_ratio = self.map_size[1] / self.map_size[0]  # height / width
-        self.fig, self.ax = plt.subplots(figsize=(6, 6 * aspect_ratio))  # Adjust aspect ratio
-        self.ax.set_xlim(-self.map_size[0] // 2, self.map_size[0] // 2)  # X: -300 to +300
-        self.ax.set_ylim(-self.map_size[1] // 2, self.map_size[1] // 2)  # Y: -450 to +450
-        self.ax.set_aspect('equal')  # Maintain equal aspect ratio
+        self.fig, self.ax = plt.subplots(
+            figsize=(6, 6 * aspect_ratio)
+        )  # Adjust aspect ratio
+        self.ax.set_xlim(
+            -self.map_size[0] // 2, self.map_size[0] // 2
+        )  # X: -300 to +300
+        self.ax.set_ylim(
+            -self.map_size[1] // 2, self.map_size[1] // 2
+        )  # Y: -450 to +450
+        self.ax.set_aspect("equal")  # Maintain equal aspect ratio
 
         # Add a grid for reference
-        self.ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+        self.ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.7)
 
         # Label axes
         self.ax.set_xlabel("X Position (cm)")
@@ -38,9 +45,14 @@ class LiveMap:
         # self.ax.imshow(self.background_image, extent=(-self.map_size[0] // 2, self.map_size[0] // 2, -self.map_size[1] // 2, self.map_size[1] // 2))
 
         # Add a red dot to represent the robot's position
-        self.robot_marker, = self.ax.plot([0], [0], 'ro', markersize=10)
-        target_x, target_y = (self.config['target_x_location'], self.config['target_y_location'])
-        self.target_marker, = self.ax.plot([target_x], [target_y], 'bo', markersize=10)
+        (self.robot_marker,) = self.ax.plot([0], [0], "ro", markersize=10)
+        target_x, target_y = (
+            self.config["target_x_location"],
+            self.config["target_y_location"],
+        )
+        (self.target_marker,) = self.ax.plot(
+            [target_x], [target_y], "bo", markersize=10
+        )
 
         # Turn on interactive mode so the plot updates
         plt.ion()
