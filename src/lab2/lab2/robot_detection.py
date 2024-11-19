@@ -18,9 +18,8 @@ class RobotDetection:
         image = frame
 
         image_copy = image.copy()
-        height, width = img.shape[:2]
 
-        height, width = img.shape[:2]
+        height, width = image.shape[:2]
         percentile_horizontal = 0.55
         percentile_to_keep_vertical = 0.95
         # Set the top half of the image to white
@@ -139,7 +138,6 @@ def determine_location(self, image_width, bbox, percentile_to_keep_vertical):
     # To exclude left and right horizontal sides that the robot does not use depending on 
     # percentile_to_keep_vertical
     vertical_offset = image_width - int(percentile_to_keep_vertical*image_width)
-    print(vertical_offset, "vertical offset")
 
     # Calculate the regions
     left_region = (vertical_offset, image_width // 3)
@@ -163,10 +161,10 @@ def determine_location(self, image_width, bbox, percentile_to_keep_vertical):
     return overlap
 
 def determine_distance_danger(self, bounding_box_height):
-    PIXEL_HEIGHT_BOUNDING_BOX_2_CM = 110
+    PIXEL_HEIGHT_BOUNDING_BOX_2_CM = 80
     approx_distance = 2 * PIXEL_HEIGHT_BOUNDING_BOX_2_CM / bounding_box_height
     # We need to find correct thresholding values for this
-    in_danger = True if approx_distance < 2 else False
+    in_danger = True if approx_distance < 4 else False
     # print(f"Robot is in danger: {in_danger}")
     if in_danger:
         print(f"approximate distance of object: {approx_distance}")
@@ -174,32 +172,30 @@ def determine_distance_danger(self, bounding_box_height):
     
     return in_danger, approx_distance
 
+def draw_lines(self, img, percentile_horizontal, percentile_to_keep_vertical):
+    height, width = img.shape[:2]
 
+    y_position = int(percentile_horizontal * height)
+        
+    x_position = int(percentile_to_keep_vertical * width)              # Calculate horizontal pixel position
+    x_position_2 = int((1 - percentile_to_keep_vertical) * width)      # Calculate horizontal pixel position other side
 
-    def draw_lines(self, img, percentile_horizontal, percentile_to_keep_vertical):
-        height, width = img.shape[:2]
+    # Horizontal Line
+    img[y_position-2:y_position, x_position_2:x_position, :]  = [0, 0, 255]  # Red color in BGR format
 
-        y_position = int(percentile_horizontal * height)
-            
-        x_position = int(percentile_to_keep_vertical * width)              # Calculate horizontal pixel position
-        x_position_2 = int((1 - percentile_to_keep_vertical) * width)      # Calculate horizontal pixel position other side
+    # Vertical Lines
+    img[y_position:, x_position:x_position+2, :] = [0, 0, 255]
+    img[y_position:, x_position_2 - 2:x_position_2, :] = [0, 0, 255]
+    return img
 
-        # Horizontal Line
-        img[y_position-2:y_position, x_position_2:x_position, :]  = [0, 0, 255]  # Red color in BGR format
+def draw_circle(self,img, coordinates):
+    radius = 2         # Radius of the circle
 
-        # Vertical Lines
-        img[y_position:, x_position:x_position+2, :] = [0, 0, 255]
-        img[y_position:, x_position_2 - 2:x_position_2, :] = [0, 0, 255]
-        return img
-    
-    def draw_circle(self,img, coordinates):
-        radius = 2         # Radius of the circle
+    # Define the color (in BGR format)
+    color = (0, 0, 255)  # Red color (BGR format)
 
-        # Define the color (in BGR format)
-        color = (0, 0, 255)  # Red color (BGR format)
+    # Define the thickness (use -1 for a filled circle)
+    thickness = 3        # Outline thickness
 
-        # Define the thickness (use -1 for a filled circle)
-        thickness = 3        # Outline thickness
-
-        # Draw the circle on the image
-        cv2.circle(img, coordinates, radius, color, thickness)
+    # Draw the circle on the image
+    cv2.circle(img, coordinates, radius, color, thickness)
