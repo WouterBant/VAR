@@ -74,7 +74,7 @@ class PipeLine:
             location, (in_dangers, left_middle_right_set), pose
         )  # TODO false, set should be replaced by the output of robot detector
         if self.config.get("save_images"):
-            self.save_movement_image(cv_image, cmd)
+            self.save_movement_image(marker_detection_results["frame"], cmd)
         self.frame_nmbr += 1
         # cmd.linear.x = 0.0
         # cmd.angular.z = 0.0

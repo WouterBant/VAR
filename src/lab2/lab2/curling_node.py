@@ -96,8 +96,8 @@ class CurlingNode(Node):
         average_angular = sum(i.angular.z for i in self.queue) / len(self.queue)
         self.queue.clear()
         twist_msg = Twist()
-        if average_linear == 0:
-            assert 1 == 2
+        # if average_linear == 0:
+        #     assert 1 == 2
         twist_msg.linear.x = average_linear  # Forward/backward
         twist_msg.angular.z = average_angular  # Rotation angle per second
         self.cmd_vel_pub.publish(twist_msg)
