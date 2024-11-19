@@ -1,5 +1,5 @@
 import numpy as np
-import math
+import random
 from scipy.optimize import least_squares
 from IPython import get_ipython
 
@@ -21,18 +21,21 @@ class Localization:
         self.previous_pose = 0
 
     def triangulate(self, marker_detection_results):
-        if len(marker_detection_results["marker_ids"]) == 0:
+        if len(marker_detection_results["marker_ids"]) < 2:
             return None, None  # TODO maybe not
             # return self.previous_location, self.previous_pose
-        
+
         position = self.triangulate_2d_ls(marker_detection_results)
         poses = self.estimate_pose(marker_detection_results, position)
 
         if len(poses) == 0:
             return None, None
             # return self.previous_location, self.previous_pose
-        
+
         average_pose = sum(poses) / len(poses)
+        # if np.sqrt(np.sum((self.previous_location - position)**2)) > 50 or random.uniform() > 0.7:
+        #     return None, None
+        
         self.previous_location = position
         self.previous_pose = average_pose
         return position, average_pose
@@ -92,7 +95,9 @@ class Localization:
 
             delta_y = MARKER_ID_2_LOCATION[marker_id].y - location[1]
             delta_x = MARKER_ID_2_LOCATION[marker_id].x - location[0]
-            distance_ground = np.sqrt(distance**2 - MARKER_ID_2_LOCATION[marker_id].z ** 2)
+            distance_ground = np.sqrt(
+                distance**2 - MARKER_ID_2_LOCATION[marker_id].z ** 2
+            )
             if abs(tvec[0]) > distance_ground:  # TODO this is hacky
                 print("skipping invalid marker location")
                 continue
@@ -103,18 +108,26 @@ class Localization:
                 print(f"deltax: {delta_x}, deltay: {delta_y}")
 
             if location[1] < MARKER_ID_2_LOCATION[marker_id].y:
-                initial_angle = np.degrees(np.arctan2(delta_y, -delta_x)) # NOTE -delta_x
+                initial_angle = np.degrees(
+                    np.arctan2(delta_y, -delta_x)
+                )  # NOTE -delta_x
                 adjust_angle = np.degrees(np.arcsin(abs(tvec[0]) / distance))
-                if tvec[0] > 0:  # you saw the marker from the right side so you are facing more left than thought
+                if (
+                    tvec[0] > 0
+                ):  # you saw the marker from the right side so you are facing more left than thought
                     angle = initial_angle - adjust_angle
                 else:
                     angle = initial_angle + adjust_angle
-                
+
             # TODO for maze you dont want to do the truncation below but for now this is fine
             else:
-                initial_angle = np.degrees(np.arctan2(delta_y, -delta_x)) # NOTE -delta_x
+                initial_angle = np.degrees(
+                    np.arctan2(delta_y, -delta_x)
+                )  # NOTE -delta_x
                 adjust_angle = np.degrees(np.arcsin(abs(tvec[0]) / distance))
-                if tvec[0] > 0:  # you saw the marker from the right side so you are facing more left than thought
+                if (
+                    tvec[0] > 0
+                ):  # you saw the marker from the right side so you are facing more left than thought
                     angle = initial_angle - adjust_angle
                 else:
                     angle = initial_angle + adjust_angle
@@ -127,7 +140,9 @@ class Localization:
                         angle = 180  # say robot is facing right
 
             if self.config["debug"] > 6:
-                print(f"initial angle: {initial_angle}, adjust angle: {adjust_angle}, angle: {angle}")
+                print(
+                    f"initial angle: {initial_angle}, adjust angle: {adjust_angle}, angle: {angle}"
+                )
                 print(f"tvec: {tvec}, distance: {distance_ground}")
                 print("----------------")
                 a = marker_detection_results["rvecs"][i]

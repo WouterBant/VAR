@@ -4,30 +4,39 @@ show_contour_area: false
 save_robot_detection_images: false
 undistort_method: default
 initial_x_location: 0.0
-initial_y_location: -4.0
+initial_y_location: -40.0
 target_x_location: 0.0
-target_y_location: 450.0
+target_y_location: 300.0
 notebook_display: true
-save_images: true
+save_images: false
 debug: 10
-print_wheel_values: true
+print_wheel_values: false
+resize_factor: 3
 
-use_custom_detector_parameters: true
+use_custom_detector_parameters: false
 detector_parameters:
-  adaptiveThreshWinSizeMin: 1
-  adaptiveThreshWinSizeMax: 15  # NO
-  adaptiveThreshWinSizeStep: 4  # NO
-  minMarkerPerimeterRate: 0.01  # NO
-  minMarkerLengthRatioOriginalImg: 0.001
-  minCornerDistanceRate: 0.02
-  maxMarkerPerimeterRate: 4.0
-  polygonalApproxAccuracyRate: 0.02
-  minMarkerDistanceRate: 0.5  # NO
-  errorCorrectionRate: 0.8 
-  maxErroneousBitsInBorderRate: 0.4
-  markerBorderBits: 2
-  aprilTagQuadDecimate: 1.0
-  aprilTagQuadSigma: 0.5
+  adaptiveThreshWinSizeMin: 3
+  adaptiveThreshWinSizeMax: 25
+  minMarkerPerimeterRate: 0.02  # NO
+  maxMarkerPerimeterRate: 10.0
+  minCornerDistanceRate: 0.03
+  polygonalApproxAccuracyRate: 0.01
+  adaptiveThreshConstant: 10
+  maxErroneousBitsInBorderRate: 0.15
+  errorCorrectionRate: 0.8
+  detectInvertedMarker: true
+    # adaptiveThreshWinSizeMin: 1
+    # adaptiveThreshWinSizeMax: 15  # NO
+    # adaptiveThreshWinSizeStep: 4  # NO
+    # minMarkerLengthRatioOriginalImg: 0.001
+    # minCornerDistanceRate: 0.02
+    # polygonalApproxAccuracyRate: 0.02
+    # minMarkerDistanceRate: 0.5  # NO
+    # errorCorrectionRate: 0.8 
+    # maxErroneousBitsInBorderRate: 0.4
+    # markerBorderBits: 2
+    # aprilTagQuadDecimate: 1.0
+    # aprilTagQuadSigma: 0.5
 
 max_linear_speed: 1.5
 max_angular_speed: 1.0
