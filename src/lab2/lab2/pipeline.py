@@ -37,7 +37,7 @@ class PipeLine:
             marker_detection_results = self.marker_detector.detect(cv_image)
             location, pose = self.localization.triangulate(marker_detection_results)
 
-            if location is not None:
+            if location is not None and self.config["show_live_map"]:
                 self.live_map.update_plot(location)
 
             if self.config.get("debug") > 2:
