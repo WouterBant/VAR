@@ -4,6 +4,7 @@ import numpy as np
 from typing import Dict
 import textwrap
 from IPython import get_ipython
+from .live_map import LiveMap
 
 try:
     if "get_ipython" in globals() and "IPKernelApp" in get_ipython().config:
@@ -27,10 +28,17 @@ class PipeLine:
         self.movement_controller = MovementController(config=self.config)
         self.frame_nmbr = 0
 
+        image_path = "/home/angelo/ros2_ws/VAR/assets/football_field.jpg"
+        if self.config["show_live_map"]:
+            self.live_map = LiveMap(image_path)
+
     def run(self, cv_image):
         if self.config.get("detect_marker"):
             marker_detection_results = self.marker_detector.detect(cv_image)
             location, pose = self.localization.triangulate(marker_detection_results)
+
+            if location is not None:
+                self.live_map.update_plot(location)
 
             if self.config.get("debug") > 2:
                 print(f"Location: {location}")

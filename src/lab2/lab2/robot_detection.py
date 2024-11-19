@@ -7,7 +7,7 @@ class RobotDetection:
     def __init__(self, config):
         self.counter = 0
         self.config = config
-        self.path_for_results = "/home/student/Desktop/VAR/assets/robot_detection_vids"
+        self.path_for_results = "/home/angelo/Desktop/VAR/assets/robot_detection_vids"
         os.makedirs(self.path_for_results, exist_ok=True)
 
 
@@ -18,9 +18,9 @@ class RobotDetection:
         image = frame
 
         image_copy = image.copy()
-        height, width = img.shape[:2]
+        height, width = image.shape[:2]
 
-        height, width = img.shape[:2]
+        height, width = image.shape[:2]
         percentile_horizontal = 0.55
         percentile_to_keep_vertical = 0.95
         # Set the top half of the image to white
@@ -29,11 +29,11 @@ class RobotDetection:
         x_position = int(percentile_to_keep_vertical * width)              # Calculate horizontal pixel position
         x_position_2 = int((1 - percentile_to_keep_vertical) * width)
         
-        img[:y_position, :] = [255, 255, 255]
-        img[:, :x_position_2, :] = [255,255,255]
-        img[:, x_position:, :] = [255,255,255]
+        image[:y_position, :] = [255, 255, 255]
+        image[:, :x_position_2, :] = [255,255,255]
+        image[:, x_position:, :] = [255,255,255]
 
-        image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB for display
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert to RGB for display
         image_hsv = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2HSV)  # Convert to HSV for segmentation
 
         # Define the black color range in HSV
@@ -108,17 +108,17 @@ class RobotDetection:
 
         return in_dangers, approx_distances
 
-def determine_distance_danger(self, bounding_box_height):
-    PIXEL_HEIGHT_BOUNDING_BOX_2_CM = 110
-    approx_distance = 2 * PIXEL_HEIGHT_BOUNDING_BOX_2_CM / bounding_box_height
-    # We need to find correct thresholding values for this
-    in_danger = True if approx_distance < 2 else False
-    # print(f"Robot is in danger: {in_danger}")
-    if in_danger:
-        print(f"approximate distance of object: {approx_distance}")
-        print(f"Robot is in danger of collision, we should stop and turn")
-    
-    return in_danger, approx_distance
+    def determine_distance_danger(self, bounding_box_height):
+        PIXEL_HEIGHT_BOUNDING_BOX_2_CM = 110
+        approx_distance = 2 * PIXEL_HEIGHT_BOUNDING_BOX_2_CM / bounding_box_height
+        # We need to find correct thresholding values for this
+        in_danger = True if approx_distance < 2 else False
+        # print(f"Robot is in danger: {in_danger}")
+        if in_danger:
+            print(f"approximate distance of object: {approx_distance}")
+            print(f"Robot is in danger of collision, we should stop and turn")
+        
+        return in_danger, approx_distance
 
 
 

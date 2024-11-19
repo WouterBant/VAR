@@ -7,10 +7,11 @@ initial_x_location: 0.0
 initial_y_location: -4.0
 target_x_location: 0.0
 target_y_location: 450.0
-notebook_display: true
+notebook_display: false
 save_images: true
 debug: 10
-print_wheel_values: true
+print_wheel_values: false
+show_live_map: true
 
 use_custom_detector_parameters: true
 detector_parameters:
