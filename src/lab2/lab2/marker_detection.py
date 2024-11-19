@@ -2,6 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython import get_ipython
+import os
 
 try:
     if "get_ipython" in globals() and "IPKernelApp" in get_ipython().config:
@@ -14,6 +15,7 @@ class MarkerDetection:
     def __init__(self, config):
         self.config = config
         self.aruco_params = self._initialize_aruco_params()
+        self.frame_nmbr = 0
 
     def _initialize_aruco_params(self):
         aruco_params = cv2.aruco.DetectorParameters()
@@ -150,88 +152,160 @@ class MarkerDetection:
                 model="thin_prism",
             )
         return img
-    
+
     # def get_camera_direction(self, rvecs, tvecs):
     #     # Convert rotation vector to rotation matrix
     #     rmat, _ = cv2.Rodrigues(rvecs[0])
-        
+
     #     # The third column of the rotation matrix represents the camera's forward direction
     #     # in world coordinates
     #     print(rmat.T)
     #     forward_direction = rmat[:, 2]
-        
+
     #     # Calculate yaw angle (rotation around Y axis) from the forward direction
     #     # Using arctangent of x/z components
     #     yaw = np.degrees(np.arctan2(-forward_direction[0], -forward_direction[2]))
-        
+
     #     return yaw
 
     def get_camera_direction(self, rvecs, tvecs):
         # Convert rotation vector to rotation matrix
         rmat, _ = cv2.Rodrigues(rvecs[0])
-        
+
         # Get Euler angles (pitch, yaw, roll)
-        euler_angles = -cv2.decomposeProjectionMatrix(np.hstack((rmat, np.zeros((3,1)))))[6]
-        
+        euler_angles = -cv2.decomposeProjectionMatrix(
+            np.hstack((rmat, np.zeros((3, 1))))
+        )[6]
+
         # Get yaw (rotation around y-axis)
         yaw = euler_angles[1][0]  # Take the yaw angle
-        
+
         # Normalize to -180 to 180 range
         if yaw > 180:
             yaw -= 360
-        
+
         return yaw
 
     def get_camera_angles(self, rvecs):
         # Convert rotation vector to rotation matrix
         rmat, _ = cv2.Rodrigues(rvecs[0])
-        
+
         # Get Euler angles in degrees (pitch, yaw, roll)
-        euler_angles = -cv2.decomposeProjectionMatrix(np.hstack((rmat, np.zeros((3,1)))))[6]
-        
+        euler_angles = -cv2.decomposeProjectionMatrix(
+            np.hstack((rmat, np.zeros((3, 1))))
+        )[6]
+
         # Extract each angle
         pitch = euler_angles[0][0]  # X-axis rotation (up/down tilt)
-        yaw = euler_angles[1][0]    # Y-axis rotation (left/right direction)
-        roll = euler_angles[2][0]   # Z-axis rotation (tilt sideways)
-        
+        yaw = euler_angles[1][0]  # Y-axis rotation (left/right direction)
+        roll = euler_angles[2][0]  # Z-axis rotation (tilt sideways)
+
         # Normalize angles to -180 to 180 range
         for angle in [pitch, yaw, roll]:
             if angle > 180:
                 angle -= 360
-                
+
         return pitch, yaw, roll
 
     def get_global_viewing_angle(self, robot_position, marker_position):
         """
         Calculate viewing angle in global coordinate system
-        
+
         Args:
             robot_position: (x, y) tuple of robot's position in global coordinates
             marker_position: (x, y) tuple of marker's known position in global coordinates
-        
+
         Returns:
             angle in degrees (-180 to 180) in global coordinate system
         """
         # Get direction vector from robot to marker
         dx = marker_position[0] - robot_position[0]
         dy = marker_position[1] - robot_position[1]
-        
+
         # Calculate angle using arctan2 (handles all quadrants correctly)
         angle = np.degrees(np.arctan2(dy, dx))
-        
+
         # Normalize to -180 to 180 range
         if angle > 180:
             angle -= 360
         elif angle < -180:
             angle += 360
-            
+
         return angle
+    
+    def super_resolve_image(input_image, scale_factor=2):
+        """
+        Perform image superresolution using OpenCV's DNN-based super-resolution model
+        
+        Args:
+            input_image (numpy.ndarray): Input low-resolution image
+            scale_factor (int): Upscaling factor (default is 2x)
+        
+        Returns:
+            numpy.ndarray: Superresolved high-resolution image
+        """
+        # Load the pre-trained EDSR model for superresolution
+        model = cv2.dnn_superres.DnnSuperResImpl_create()
+        
+        # Available models in OpenCV:
+        # - EDSR x2
+        # - EDSR x3
+        # - EDSR x4
+        # - ESPCN x2
+        # - ESPCN x3
+        # - ESPCN x4
+        # - FSRCNN x2
+        # - FSRCNN x3
+        # - FSRCNN x4
+        model_path = f'EDSR_x{scale_factor}.pb'
+        
+        try:
+            # Load the model
+            model.readModel(model_path)
+            model.setModel("edsr", scale_factor)
+            
+            # Perform superresolution
+            sr_image = model.upsample(input_image)
+            
+            return sr_image
+        
+        except Exception as e:
+            print(f"Error in superresolution: {e}")
+            return input_image
 
     def detect(self, frame):
-        # increase contrast in frame
-        # frame = cv2.convertScaleAbs(frame, alpha=2.0, beta=1)  # 3, 0 works
+        if self.config.get("save_images"):
+            os.makedirs("input_images", exist_ok=True)
+            cv2.imwrite(
+                f"input_images/{self.frame_nmbr}.jpg",
+                cv2.cvtColor(frame, cv2.COLOR_RGB2BGR),
+            )
+            self.frame_nmbr += 1
+        resize_factor = self.config.get("resize_factor", 3)
+        frame_size = (frame.shape[1] * resize_factor, frame.shape[0] * resize_factor)
+        # frame = self.super_resolve_image(frame)
+        frame = cv2.resize(frame, frame_size, interpolation=cv2.INTER_CUBIC)
+        # frame = cv2.convertScaleAbs(frame, alpha=1.6, beta=0)  # 3, 0 works
         # frame = self._undistort_image(frame)
-        all_corners, all_marker_ids, all_distances, all_sizes, all_tvecs, all_rvecs = [], [], [], [], [], []
+        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # _, frame = cv2.threshold(gray, 245, 255, cv2.THRESH_BINARY_INV)
+        # frame = cv2.convertScaleAbs(frame, alpha=1.5, beta=20)
+
+        # invert colors
+        # frame = cv2.bitwise_not(frame)
+        # frame = cv2.convertScaleAbs(frame, alpha=1.5, beta=20)
+
+        kernel = np.array([[0, -1, 0], [-1, 5,-1], [0, -1, 0]]) / 2
+        for _ in range(0):
+            frame = cv2.filter2D(frame, -1, kernel)
+        all_corners, all_marker_ids, all_distances, all_sizes, all_tvecs, all_rvecs = (
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        )
         for desired_aruco_dictionary in ARUCO_DICT.keys():
             this_aruco_dictionary = cv2.aruco.getPredefinedDictionary(
                 ARUCO_DICT[desired_aruco_dictionary]
@@ -248,19 +322,22 @@ class MarkerDetection:
             if ids is None:
                 continue
 
+            K = np.array(
+                [
+                    [290.46301, 0.0, 312.90291],
+                    [0.0, 290.3703, 203.01488],
+                    [0.0, 0.0, 1.0],
+                ]
+            )*resize_factor
+            K[2, 2] = 1.0
+
             for marker_corner, marker_id in zip(corners, ids):
                 if marker_id is not None and marker_id[0] in MARKER_ID_2_LOCATION:
                     marker_size = MARKER_ID_2_LOCATION[marker_id[0]].height
                     rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
                         marker_corner,
                         marker_size,
-                        np.array(
-                            [
-                                [290.46301, 0.0, 312.90291],
-                                [0.0, 290.3703, 203.01488],
-                                [0.0, 0.0, 1.0],
-                            ]
-                        ),
+                        K,
                         np.array(
                             [
                                 -2.79797e-01,
@@ -272,10 +349,10 @@ class MarkerDetection:
                         ),
                     )
 
-                    print(rvecs.shape, tvecs.shape, marker_corner.shape)
-                    print(tvecs)
-                    print(self.get_camera_direction(rvecs, tvecs), "eeeeeee")
-                    print(self.get_camera_angles(rvecs), "fffffffffff")
+                    # print(rvecs.shape, tvecs.shape, marker_corner.shape)
+                    # print(tvecs)
+                    # print(self.get_camera_direction(rvecs, tvecs), "eeeeeee")
+                    # print(self.get_camera_angles(rvecs), "fffffffffff")
 
                     assert (
                         len(marker_id) == 1
@@ -284,17 +361,19 @@ class MarkerDetection:
                         len(marker_corner) == 1
                     ), f"More than one marker corner detected: {marker_corner}"
 
-                    if abs(tvecs[0][0][1]) > 120:
-                        print(f"skipping marker {marker_id[0]}")
-                        continue
+                    # if abs(tvecs[0][0][1]) > 120:
+                    #     print(f"skipping marker {marker_id[0]}")
+                    #     continue
 
                     all_corners.extend(marker_corner)
                     all_marker_ids.append(marker_id[0])
                     all_tvecs.append(tvecs[0][0])
-                    all_distances.append(np.linalg.norm(tvecs))  # TODO this seems to work better
+                    all_distances.append(
+                        np.linalg.norm(tvecs)
+                    )  # TODO this seems to work better
                     all_rvecs.append(rvecs[0][0])
                     # all_distances.append(
-                        # tvecs[0][0][2]
+                    # tvecs[0][0][2]
                     # )  # TODO maybe this is good or the above
                     all_sizes.append(marker_size)
 

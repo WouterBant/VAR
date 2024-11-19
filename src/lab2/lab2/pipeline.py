@@ -42,6 +42,7 @@ class PipeLine:
 
             if self.config.get("debug") > 2:
                 print(f"Location: {location}")
+            print(f"Location: {location}")
 
             if self.config.get("save_images"):
                 os.makedirs("marker_images", exist_ok=True)
@@ -73,6 +74,8 @@ class PipeLine:
         if self.config.get("save_images"):
             self.save_movement_image(cv_image, cmd)
         self.frame_nmbr += 1
+        # cmd.linear.x = 0.0
+        # cmd.angular.z = 0.0 
         return cmd
 
     def save_movement_image(self, cv_image, cmd):

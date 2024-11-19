@@ -21,7 +21,9 @@ class MovementController:
             "escape_turn_speed"
         )  # rad/s for escape maneuvers
 
-    def move_to_target(self, current_pos, obstacle_detection: Tuple[bool, Set[str]], pose: float):
+    def move_to_target(
+        self, current_pos, obstacle_detection: Tuple[bool, Set[str]], pose: float
+    ):
         """
         Move robot towards target position while avoiding obstacles
 
@@ -44,7 +46,7 @@ class MovementController:
         dy = self.config.get("target_y_location") - current_pos[1]
 
         if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
-            cmd = Twist()  
+            cmd = Twist()
             return cmd
 
         distance = math.sqrt(dx * dx + dy * dy)
@@ -55,7 +57,7 @@ class MovementController:
             print("calculated angle: ", target_angle)
             print(f"pose: {pose}")
             print(f"Use angle: {use_angle}")
-        
+
         cmd = Twist()
 
         # If we're close enough to target, stop
@@ -146,7 +148,7 @@ class MovementController:
     def _get_angular_velocity(self, angle_diff):
         """Get angular velocity based on heading difference"""
         # Simple proportional control
-        kp = 1/18  # TODO tune this more if needed
+        kp = 1 / 18  # TODO tune this more if needed
         return kp * angle_diff
 
     def _publish_stop(self):

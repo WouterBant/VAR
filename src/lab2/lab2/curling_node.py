@@ -5,7 +5,7 @@ import yaml
 import cv2
 import numpy as np
 from .pipeline import PipeLine
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import CompressedImage, Image
 from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
@@ -18,9 +18,15 @@ class CurlingNode(Node):
 
         self.load_config()
         self.pipeline = PipeLine(config=self.config)
+        # self.image_sub = self.create_subscription(
+        #     CompressedImage,
+        #     "/rae/right/image_raw/compressed",
+        #     self.image_callback,
+        #     10,
+        # )
         self.image_sub = self.create_subscription(
-            CompressedImage,
-            "/rae/right/image_raw/compressed",
+            Image,
+            "/rae/right/image_raw",
             self.image_callback,
             10,
         )
@@ -54,14 +60,14 @@ class CurlingNode(Node):
             "lab2",
             "config.yaml",
         )
-        config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
+        # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
 
     def image_callback(self, msg):
-        # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        np_arr = np.frombuffer(msg.data, np.uint8)
-        cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        # np_arr = np.frombuffer(msg.data, np.uint8)
+        # cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         self.delay += 1
         if self.delay % 4 != 0:
             return
@@ -80,15 +86,18 @@ class CurlingNode(Node):
     def timer_callback(self):
         if self.config["print_wheel_values"]:
             if self.left_wheel_value and self.right_wheel_value:
-                print(f"Left Wheel - Value: {self.left_wheel_value[0]}")
-                print(f"Right Wheel - Value: {self.right_wheel_value[0]}")
-                
+                pass
+                # print(f"Left Wheel - Value: {self.left_wheel_value[0]}")
+                # print(f"Right Wheel - Value: {self.right_wheel_value[0]}")
+
         if len(self.queue) == 0:
             return
         average_linear = sum(i.linear.x for i in self.queue) / len(self.queue)
         average_angular = sum(i.angular.z for i in self.queue) / len(self.queue)
         self.queue.clear()
         twist_msg = Twist()
+        if average_linear == 0:
+            assert 1 == 2
         twist_msg.linear.x = average_linear  # Forward/backward
         twist_msg.angular.z = average_angular  # Rotation angle per second
         self.cmd_vel_pub.publish(twist_msg)
