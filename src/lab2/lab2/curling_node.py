@@ -2,10 +2,8 @@ import rclpy
 from rclpy.node import Node
 import os
 import yaml
-import cv2
-import numpy as np
 from .pipeline import PipeLine
-from sensor_msgs.msg import CompressedImage, Image
+from sensor_msgs.msg import Image
 from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist

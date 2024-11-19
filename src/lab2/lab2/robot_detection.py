@@ -192,34 +192,44 @@ def determine_distance_danger(self, bounding_box_height):
     # print(f"Robot is in danger: {in_danger}")
     if in_danger:
         print(f"approximate distance of object: {approx_distance}")
-        print(f"Robot is in danger of collision, we should stop and turn")
+        print("Robot is in danger of collision, we should stop and turn")
 
     return in_danger, approx_distance
+
 
 def draw_lines(self, img, percentile_horizontal, percentile_to_keep_vertical):
     height, width = img.shape[:2]
 
     y_position = int(percentile_horizontal * height)
-        
-    x_position = int(percentile_to_keep_vertical * width)              # Calculate horizontal pixel position
-    x_position_2 = int((1 - percentile_to_keep_vertical) * width)      # Calculate horizontal pixel position other side
+
+    x_position = int(
+        percentile_to_keep_vertical * width
+    )  # Calculate horizontal pixel position
+    x_position_2 = int(
+        (1 - percentile_to_keep_vertical) * width
+    )  # Calculate horizontal pixel position other side
 
     # Horizontal Line
-    img[y_position-2:y_position, x_position_2:x_position, :]  = [0, 0, 255]  # Red color in BGR format
+    img[y_position - 2 : y_position, x_position_2:x_position, :] = [
+        0,
+        0,
+        255,
+    ]  # Red color in BGR format
 
     # Vertical Lines
-    img[y_position:, x_position:x_position+2, :] = [0, 0, 255]
-    img[y_position:, x_position_2 - 2:x_position_2, :] = [0, 0, 255]
+    img[y_position:, x_position : x_position + 2, :] = [0, 0, 255]
+    img[y_position:, x_position_2 - 2 : x_position_2, :] = [0, 0, 255]
     return img
 
-def draw_circle(self,img, coordinates):
-    radius = 2         # Radius of the circle
+
+def draw_circle(self, img, coordinates):
+    radius = 2  # Radius of the circle
 
     # Define the color (in BGR format)
     color = (0, 0, 255)  # Red color (BGR format)
 
     # Define the thickness (use -1 for a filled circle)
-    thickness = 3        # Outline thickness
+    thickness = 3  # Outline thickness
 
     # Draw the circle on the image
     cv2.circle(img, coordinates, radius, color, thickness)

@@ -1,5 +1,4 @@
 import numpy as np
-import random
 from scipy.optimize import least_squares
 from IPython import get_ipython
 
