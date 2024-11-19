@@ -35,7 +35,7 @@ class Localization:
         average_pose = sum(poses) / len(poses)
         # if np.sqrt(np.sum((self.previous_location - position)**2)) > 50 or random.uniform() > 0.7:
         #     return None, None
-        
+
         self.previous_location = position
         self.previous_pose = average_pose
         return position, average_pose

@@ -57,13 +57,13 @@ class PipeLine:
             # Else e.g in_dangers = [False, True, False] and approx_distances = [3, 1.5, 4] (cm's)
             in_dangers, left_middle_right_set = self.robot_detector.detect(cv_image)
 
-            if self.config.get("debug") > 2:
-                print(f"Robot detection: {img}, {mask}")
+            # if self.config.get("debug") > 2:
+            #     print(f"Robot detection: {img}, {mask}")
 
-            if self.config.get("save_images"):
-                os.makedirs("robot_images", exist_ok=True)
-                cv2.imwrite(f"robot_images/{self.frame_nmbr}.jpg", img)
-                cv2.imwrite(f"robot_images/{self.frame_nmbr}_mask.jpg", mask)
+            # if self.config.get("save_images"):
+            #     os.makedirs("robot_images", exist_ok=True)
+            #     cv2.imwrite(f"robot_images/{self.frame_nmbr}.jpg", img)
+            #     cv2.imwrite(f"robot_images/{self.frame_nmbr}_mask.jpg", mask)
         else:
             in_dangers = False
             left_middle_right_set = None
@@ -77,7 +77,7 @@ class PipeLine:
             self.save_movement_image(marker_detection_results["frame"], cmd)
         self.frame_nmbr += 1
         # cmd.linear.x = 0.0
-        # cmd.angular.z = 0.0 
+        # cmd.angular.z = 0.0
         return cmd
 
     def save_movement_image(self, cv_image, cmd):

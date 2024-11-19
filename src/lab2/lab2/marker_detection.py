@@ -271,13 +271,16 @@ class MarkerDetection:
             if ids is None:
                 continue
 
-            K = np.array(
-                [
-                    [290.46301, 0.0, 312.90291],
-                    [0.0, 290.3703, 203.01488],
-                    [0.0, 0.0, 1.0],
-                ]
-            )*resize_factor
+            K = (
+                np.array(
+                    [
+                        [290.46301, 0.0, 312.90291],
+                        [0.0, 290.3703, 203.01488],
+                        [0.0, 0.0, 1.0],
+                    ]
+                )
+                * resize_factor
+            )
             K[2, 2] = 1.0
 
             for marker_corner, marker_id in zip(corners, ids):
