@@ -50,7 +50,9 @@ class MovementController:
         #     return cmd  TODO think about what happens when we are past the line
 
         distance = math.sqrt(dx * dx + dy * dy)
-        if distance < 0.2: assert 1 == 2  # TODO maybe finetune this value
+        if distance < self.position_tolerance:
+            # self._publish_stop()
+            assert 1 == 2  # TODO maybe finetune this value or above
 
         target_angle = np.degrees(math.atan2(dy, -dx))
         use_angle = pose - target_angle
@@ -61,11 +63,6 @@ class MovementController:
             print(f"Use angle: {use_angle}")
 
         cmd = Twist()
-
-        # If we're close enough to target, stop
-        if distance < self.position_tolerance:
-            self._publish_stop()
-            return
 
         # Handle dangerous situations first
         if is_danger:
@@ -81,7 +78,7 @@ class MovementController:
 
         # If danger is directly ahead, prioritize avoiding it
         if "middle" in danger_positions:
-            cmd.linear.x = 0.75  # Move forward slowly
+            cmd.linear.x = 0.2  # Move forward slowly
 
             # Choose escape direction based on target angle and available space
             if "left" not in danger_positions and "right" in danger_positions:
@@ -132,14 +129,6 @@ class MovementController:
         print(f"Linear: {cmd.linear.x}, Angular: {cmd.angular.z}")
 
         return cmd
-
-    def _normalize_angle(self, angle):
-        """Normalize angle to [-pi, pi]"""
-        while angle > math.pi:
-            angle -= 2 * math.pi
-        while angle < -math.pi:
-            angle += 2 * math.pi
-        return angle
 
     def _get_linear_velocity(self, distance):
         """Get linear velocity based on distance to target"""
