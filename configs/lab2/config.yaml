@@ -42,5 +42,7 @@ detector_parameters:
 max_linear_speed: 1.5
 max_angular_speed: 1.0
 position_tolerance: 0.1
-danger_slow_factor: 0.3
-escape_turn_speed: 0.75
+danger_slow_factor: 0.1
+escape_turn_speed: 0.2
+linear_kp: 0.2
+angular_kp: 0.05

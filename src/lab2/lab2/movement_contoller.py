@@ -45,14 +45,13 @@ class MovementController:
         dx = self.config.get("target_x_location") - current_pos[0]
         dy = self.config.get("target_y_location") - current_pos[1]
 
-        if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
-            cmd = Twist()
-            return cmd
-
-        if np.sqrt(dx**2 + dy**2) < 0.3:  # TODO stop if we are close to the target
-            assert 1 == 2
+        # if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
+        #     cmd = Twist()
+        #     return cmd  TODO think about what happens when we are past the line
 
         distance = math.sqrt(dx * dx + dy * dy)
+        if distance < 0.2: assert 1 == 2  # TODO maybe finetune this value
+
         target_angle = np.degrees(math.atan2(dy, -dx))
         use_angle = pose - target_angle
 
@@ -144,14 +143,12 @@ class MovementController:
 
     def _get_linear_velocity(self, distance):
         """Get linear velocity based on distance to target"""
-        # Simple proportional control
-        kp = 0.5
+        kp = self.config.get("linear_kp")
         return kp * distance
 
     def _get_angular_velocity(self, angle_diff):
         """Get angular velocity based on heading difference"""
-        # Simple proportional control
-        kp = 1 / 18  # TODO tune this more if needed
+        kp = self.config.get("angular_kp")
         return kp * angle_diff
 
     def _publish_stop(self):
