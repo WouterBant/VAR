@@ -9,7 +9,7 @@ class LiveMap:
         self.load_config()
 
         # Set up the map with a desired size
-        self.map_size = (600, 900)  # Map size (width x height in cm)
+        self.map_size = (620, 920)  # Map size (width x height in cm)
 
         # Create a figure and axes for plotting
         aspect_ratio = self.map_size[1] / self.map_size[0]  # height / width

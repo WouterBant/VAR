@@ -28,7 +28,7 @@ class PipeLine:
         self.movement_controller = MovementController(config=self.config)
         self.frame_nmbr = 0
 
-        image_path = "/home/angelo/ros2_ws/VAR/assets/football_field.jpg"
+        image_path = "/home/angelo/ros2_ws/VAR/assets/voetbalveld.jpg"
         if self.config["show_live_map"]:
             self.live_map = LiveMap(image_path)
 
