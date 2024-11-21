@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import os
+import matplotlib.pyplot as plt
 
 
 class RobotDetection:
@@ -134,23 +134,23 @@ class RobotDetection:
                 model="thin_prism",
             )
         return img
-    
+
     def crop_image(self, img, x_perc, y_perc):
         h, w = img.shape[:2]
         x = int(w * x_perc) // 2
         y = int(h * y_perc)
-        return img[y:, x:w-x]
+        return img[y:, x : w - x]
 
     def white_image(self, img):
         h, w = img.shape[:2]
 
-        img[:h//3, :w//8] = [255, 255, 255]
-        img[:h//3, -w//8:] = [255, 255, 255]
-        img[:h//4, -w//4:-w//8] = [255, 255, 255]
-        img[:h//4, w//8:w//4] = [255, 255, 255]
+        img[: h // 3, : w // 8] = [255, 255, 255]
+        img[: h // 3, -w // 8 :] = [255, 255, 255]
+        img[: h // 4, -w // 4 : -w // 8] = [255, 255, 255]
+        img[: h // 4, w // 8 : w // 4] = [255, 255, 255]
         # img[:h//6, w//4:-w//4] = [255, 255, 255]
         return img
-    
+
     def find_black_objects(self, img):
         image_hsv = cv2.cvtColor(
             img, cv2.COLOR_BGR2HSV
@@ -167,7 +167,7 @@ class RobotDetection:
 
         # Apply some morphological operations to clean up the mask
         # Erode to remove small black artifacts/ connect larger objects with dilate
-        mask = cv2.erode(mask, np.ones((7, 7), np.uint8), iterations=1)
+        mask = cv2.erode(mask, np.ones((11, 11), np.uint8), iterations=1)
         # mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=2)
 
         # Optionally, smooth the edges of the mask/ DO NOT THINK THIS HELPS
@@ -176,7 +176,7 @@ class RobotDetection:
         # Find contours of the segmented regions
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         return contours
-    
+
     def get_contour_info(self, contours, min_width=50):
         """
         For each contour, check if the bottom line width is greater than `min_width`.
@@ -197,11 +197,11 @@ class RobotDetection:
                 # Calculate the middle of the bottom line
                 middle_x = x + width // 2
                 y = y + height  # Middle of the bounding box height-wise
-                
+
                 # Append contour info
                 valid_contours_info.append((middle_x, y, width, height))
         return valid_contours_info
-    
+
     def make_decision(self, frame, contours_info):
         if len(contours_info) == 0:
             return False, set()
@@ -220,14 +220,12 @@ class RobotDetection:
                     positions_danger.add("middle")
                 elif middle_x in range(right_range, width_frame):
                     positions_danger.add("right")
-        return in_danger, positions_danger            
-    
+        return in_danger, positions_danger
+
     def draw_contours(self, img, contours):
         return cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
 
-    def detect(
-        self, frame, show_line=True, show_contour_area=True, show_live_detection=True
-    ):
+    def detect(self, frame):
         frame = self._undistort_image(frame)
         frame = self.crop_image(frame, 0.48, 0.8)
         frame = self.white_image(frame)
@@ -236,10 +234,12 @@ class RobotDetection:
         in_danger, positions_danger = self.make_decision(frame, contours_info)
 
         if not self.config.get("notebook_display"):
-            cv2.imshow("Frame", frame)
+            cv2.imshow("Frame", self.draw_contours(frame, contours))
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 cv2.destroyAllWindows()
+        else:
+            plt.imshow(self.draw_contours(frame, contours))
+            plt.show()
 
         return in_danger, positions_danger
-

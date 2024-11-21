@@ -34,9 +34,7 @@ class LineFollowerNode(Node):
         self.line_follower = LineFollower(config=self.config)
 
         # Create publisher for robot movement
-        self.cmd_vel_pub = self.create_publisher(
-            Twist, "/cmd_vel", 1
-        )  # TODO set this to one
+        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)
 
         # Subscribe to camera image
         # self.image_sub = self.create_subscription(
@@ -46,7 +44,7 @@ class LineFollowerNode(Node):
             CompressedImage,
             "/rae/right/image_raw/compressed",
             self.image_callback,
-            10,  # TODO maybe one
+            10,
         )
 
         # self.timer = self.create_timer(0.8, self.timer_callback)

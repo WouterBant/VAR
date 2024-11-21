@@ -79,7 +79,7 @@ class RobotDetection:
         in_dangers = []
         approx_distances = []
         left_middle_right_set = []
-        
+
         # Draw bounding boxes around detected ducks on the original image
         for contour in contours:
             contour_area = cv2.contourArea(contour)
@@ -156,7 +156,6 @@ class RobotDetection:
             if not in_danger:
                 return False, None
 
-
     def determine_location(self, image_width, bbox, percentile_to_keep_vertical):
         x, y, w, h = bbox
         bbox_start = x
@@ -188,7 +187,6 @@ class RobotDetection:
 
         return overlap
 
-
     def determine_distance_danger(self, bounding_box_height):
         PIXEL_HEIGHT_BOUNDING_BOX_2_CM = 120
         approx_distance = 2 * PIXEL_HEIGHT_BOUNDING_BOX_2_CM / bounding_box_height
@@ -200,7 +198,6 @@ class RobotDetection:
             print("Robot is in danger of collision, we should stop and turn")
 
         return in_danger, approx_distance
-
 
     def draw_lines(self, img, percentile_horizontal, percentile_to_keep_vertical):
         height, width = img.shape[:2]
@@ -225,7 +222,6 @@ class RobotDetection:
         img[y_position:, x_position : x_position + 2, :] = [0, 0, 255]
         img[y_position:, x_position_2 - 2 : x_position_2, :] = [0, 0, 255]
         return img
-
 
     def draw_circle(self, img, coordinates):
         radius = 2  # Radius of the circle

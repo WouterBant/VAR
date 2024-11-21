@@ -3,6 +3,7 @@ import os
 import yaml
 import cv2
 
+
 class LiveMap:
     def __init__(self, image_path):
         # Load config
@@ -38,10 +39,20 @@ class LiveMap:
         self.background_image = cv2.cvtColor(self.background_image, cv2.COLOR_BGR2RGB)
 
         # Resize the image to match the map size (this will adjust the dimensions)
-        self.background_image = cv2.resize(self.background_image, (self.map_size[1], self.map_size[0]))
+        self.background_image = cv2.resize(
+            self.background_image, (self.map_size[1], self.map_size[0])
+        )
 
         # # Display the background image
-        self.ax.imshow(self.background_image, extent=(-self.map_size[0] // 2, self.map_size[0] // 2, -self.map_size[1] // 2, self.map_size[1] // 2))
+        self.ax.imshow(
+            self.background_image,
+            extent=(
+                -self.map_size[0] // 2,
+                self.map_size[0] // 2,
+                -self.map_size[1] // 2,
+                self.map_size[1] // 2,
+            ),
+        )
 
         # Add a red dot to represent the robot's position
         (self.robot_marker,) = self.ax.plot([0], [0], "ro", markersize=10)

@@ -41,9 +41,8 @@ class PipeLine:
             if location is not None and self.config["show_live_map"]:
                 self.live_map.update_plot(location)
 
-            if self.config.get("debug") > 2:
+            if self.config.get("debug") > 0:
                 print(f"Location: {location}")
-            print(f"Location: {location}")
 
             if self.config.get("save_images"):
                 os.makedirs("marker_images", exist_ok=True)
@@ -55,7 +54,8 @@ class PipeLine:
 
         if self.config.get("detect_robot"):
             in_dangers, left_middle_right_set = self.robot_detector.detect(cv_image)
-            print(f"Robot detection: {in_dangers}, {left_middle_right_set}")
+            if self.config.get("debug") > 0:
+                print(f"Robot detection: {in_dangers}, {left_middle_right_set}")
         else:
             in_dangers = False
             left_middle_right_set = None
@@ -66,8 +66,6 @@ class PipeLine:
         if self.config.get("save_images"):
             self.save_movement_image(marker_detection_results["frame"], cmd)
         self.frame_nmbr += 1
-        cmd.linear.x = 0.0
-        cmd.angular.z = 0.0
         return cmd
 
     def save_movement_image(self, cv_image, cmd):

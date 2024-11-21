@@ -35,7 +35,7 @@ class MovementController:
         """
         is_danger, danger_positions = obstacle_detection
 
-        if current_pos is None:  # TODO maybe not but prevents circles
+        if current_pos is None:
             cmd = Twist()
             cmd.linear.x = 0.5
             cmd.angular.z = 0.0
@@ -48,6 +48,9 @@ class MovementController:
         if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
             cmd = Twist()
             return cmd
+
+        if np.sqrt(dx**2 + dy**2) < 0.3:  # TODO stop if we are close to the target
+            assert 1 == 2
 
         distance = math.sqrt(dx * dx + dy * dy)
         target_angle = np.degrees(math.atan2(dy, -dx))

@@ -4,12 +4,12 @@ show_contour_area: false
 save_robot_detection_images: false
 undistort_method: default
 initial_x_location: 0.0
-initial_y_location: -400.0
-target_x_location: 0.0
-target_y_location: 300.0
-notebook_display: false
+initial_y_location: 0.0
+target_x_location: 200.0
+target_y_location: 260.5
+notebook_display: true
 save_images: true
-debug: 0
+debug: 1
 print_wheel_values: false
 show_live_map: false
 resize_factor: 3
