@@ -118,7 +118,7 @@ class MovementController:
         cmd.linear.x = self._get_linear_velocity(distance)
 
         # Reduce forward speed if any dangers detected
-        if len(danger_positions) > 0:
+        if danger_positions is not None and len(danger_positions) > 0:
             cmd.linear.x *= self.danger_slow_factor
         cmd.angular.z = self._get_angular_velocity(target_angle)
 

@@ -1,17 +1,17 @@
 detect_marker: true
-detect_robot: false
+detect_robot: true
 show_contour_area: false 
 save_robot_detection_images: false
 undistort_method: default
 initial_x_location: 0.0
-initial_y_location: -40.0
+initial_y_location: -400.0
 target_x_location: 0.0
 target_y_location: 300.0
 notebook_display: false
 save_images: true
-debug: 10
+debug: 0
 print_wheel_values: false
-show_live_map: true
+show_live_map: false
 resize_factor: 3
 
 use_custom_detector_parameters: false
