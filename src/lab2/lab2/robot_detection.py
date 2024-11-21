@@ -7,7 +7,7 @@ class RobotDetection:
     def __init__(self, config):
         self.counter = 0
         self.config = config
-        self.path_for_results = "/home/angelo/Desktop/VAR/assets/robot_detection_vids"
+        self.path_for_results = "/home/student/Desktop/VAR/assets/robot_detection_vids"
         os.makedirs(self.path_for_results, exist_ok=True)
 
     def detect(
@@ -129,9 +129,9 @@ class RobotDetection:
 
                 if show_live_detection:
                     cv2.imshow("Robot Detection", image_copy)
-                    # cv2.waitKey(1)  # Ensure the window updates properly
-                    # cv2.imshow("Mask Robot", mask)
-                    # cv2.waitKey(1)  # Ensure the window updates properly
+                    cv2.waitKey(1)  # Ensure the window updates properly
+                    cv2.imshow("Mask Robot", mask)
+                    cv2.waitKey(1)  # Ensure the window updates properly
 
         # This structure is a bit weird when determine in_danger, but might be useful for later
         # If we want to distinguish between multiple robots.

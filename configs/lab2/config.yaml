@@ -39,8 +39,8 @@ detector_parameters:
     # aprilTagQuadDecimate: 1.0
     # aprilTagQuadSigma: 0.5
 
-max_linear_speed: 0.5
-max_angular_speed: 0.5
+max_linear_speed: 1.5
+max_angular_speed: 1.0
 position_tolerance: 0.1
 danger_slow_factor: 0.3
 escape_turn_speed: 0.75

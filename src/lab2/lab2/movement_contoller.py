@@ -37,7 +37,7 @@ class MovementController:
 
         if current_pos is None:  # TODO maybe not but prevents circles
             cmd = Twist()
-            cmd.linear.x = 0.25
+            cmd.linear.x = 0.5
             cmd.angular.z = 0.0
             return cmd
 
@@ -79,7 +79,7 @@ class MovementController:
 
         # If danger is directly ahead, prioritize avoiding it
         if "middle" in danger_positions:
-            cmd.linear.x = 0.1  # Move forward slowly
+            cmd.linear.x = 0.75  # Move forward slowly
 
             # Choose escape direction based on target angle and available space
             if "left" not in danger_positions and "right" in danger_positions:
@@ -118,9 +118,9 @@ class MovementController:
         cmd.linear.x = self._get_linear_velocity(distance)
 
         # Reduce forward speed if any dangers detected
-        # if len(danger_positions) > 0:
-        #     cmd.linear.x *= self.danger_slow_factor
-        # cmd.angular.z = self._get_angular_velocity(target_angle)
+        if len(danger_positions) > 0:
+            cmd.linear.x *= self.danger_slow_factor
+        cmd.angular.z = self._get_angular_velocity(target_angle)
 
         # Ensure we're not exceeding max speeds
         cmd.linear.x = min(cmd.linear.x, self.max_linear_speed)
