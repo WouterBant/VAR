@@ -21,6 +21,7 @@ setup(
         "console_scripts": [
             "curling = lab2.curling_node:main",
             "image_saver = lab2.img_saver_node:main",
+            "wheel_odometry = lab2.wheel_odometry_node:main",
         ],
     },
 )

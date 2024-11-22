@@ -8,6 +8,7 @@ from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
+from .wheel_odometry import WheelOdometry
 
 
 class CurlingNode(Node):
@@ -46,6 +47,10 @@ class CurlingNode(Node):
         self.queue: Deque[Twist] = Deque(maxlen=5)
         self.timer = self.create_timer(0.1, self.timer_callback)
 
+        self.loc = (0, 0)
+        self.pose = 90
+        self.wheel_odometry = WheelOdometry()
+
     def load_config(self):
         config_path = os.path.join(
             os.path.dirname(__file__),
@@ -69,17 +74,11 @@ class CurlingNode(Node):
         self.delay += 1
         if self.delay % 4 != 0:
             return
-        action = self.pipeline(cv_image)
+        action = self.pipeline(cv_image, self.loc, self.pose)
         self.queue.append(action)
 
     def joint_state_callback(self, msg):
-        joint_data = {
-            joint_name: interface.values
-            for joint_name, interface in zip(msg.joint_names, msg.interface_values)
-        }
-
-        self.left_wheel_value = joint_data.get("left_wheel_joint", None)
-        self.right_wheel_value = joint_data.get("right_wheel_joint", None)
+        self.loc, self.pose = self.wheel_odometry.joint_state_callback(msg)
 
     def timer_callback(self):
         if self.config["print_wheel_values"]:

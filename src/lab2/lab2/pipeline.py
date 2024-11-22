@@ -28,14 +28,26 @@ class PipeLine:
         self.movement_controller = MovementController(config=self.config)
         self.frame_nmbr = 0
 
-        image_path = "/home/angelo/ros2_ws/VAR/assets/voetbalveld.jpg"
+        image_path = os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "assets",
+            "voetbalveld.jpg",
+        )
+        # image_path = "/home/angelo/ros2_ws/VAR/assets/voetbalveld.jpg"
         if self.config["show_live_map"]:
             self.live_map = LiveMap(image_path)
 
-    def run(self, cv_image):
+    def run(self, cv_image, loc, pose):
         if self.config.get("detect_marker"):
             marker_detection_results = self.marker_detector.detect(cv_image)
-            location, pose = self.localization.triangulate(marker_detection_results)
+            location, pose_ = self.localization.triangulate(marker_detection_results)
+
+            location = loc
 
             if location is not None and self.config["show_live_map"]:
                 self.live_map.update_plot(location)
@@ -120,5 +132,5 @@ class PipeLine:
             canvas,
         )
 
-    def __call__(self, cv_image):
-        return self.run(cv_image)
+    def __call__(self, cv_image, loc, pos):
+        return self.run(cv_image, loc, pos)
