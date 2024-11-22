@@ -35,6 +35,7 @@ class Localization:
         return position, average_pose
 
     def triangulate_2d_ls(self, marker_detection_results):
+        return self.previous_location
         if len(marker_detection_results["marker_ids"]) == 0:
             return self.previous_location
 

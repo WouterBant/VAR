@@ -1,13 +1,14 @@
 import matplotlib.pyplot as plt
-import os
+
+# import os
 import yaml
 import cv2
 
 
 class LiveMap:
-    def __init__(self, image_path):
+    def __init__(self, image_path, config_path):
         # Load config
-        self.load_config()
+        self.load_config(config_path)
 
         # Set up the map with a desired size
         self.map_size = (620, 920)  # Map size (width x height in cm)
@@ -82,18 +83,18 @@ class LiveMap:
         self.fig.canvas.draw()  # Draw the figure
         self.fig.canvas.flush_events()  # Refresh the canvas to show updates
 
-    def load_config(self):
-        config_path = os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "..",
-            "..",
-            "..",
-            "..",
-            "configs",
-            "lab2",
-            "config.yaml",
-        )
+    def load_config(self, config_path):
+        # config_path = os.path.join(
+        #     os.path.dirname(__file__),
+        #     "..",
+        #     "..",
+        #     "..",
+        #     "..",
+        #     "..",
+        #     "configs",
+        #     "lab2",
+        #     "config.yaml",
+        # )
         # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)

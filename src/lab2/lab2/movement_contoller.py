@@ -33,6 +33,9 @@ class MovementController:
             obstacle_detection: tuple (isDanger, set of positions["left", "right", "middle"])
             pse: float between 0 and 180 of current orientation of the robot (0 means to left 180 to right)
         """
+        # cmd = Twist()
+        # cmd.linear.x = 0.1
+        # return cmd
         is_danger, danger_positions = obstacle_detection
 
         if current_pos is None:

@@ -29,6 +29,18 @@ class PipeLine:
         self.movement_controller = MovementController(config=self.config)
         self.frame_nmbr = 0
 
+        config_path = os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "configs",
+            "lab2",
+            "config.yaml",
+        )
+        # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
         image_path = os.path.join(
             os.path.dirname(__file__),
             "..",
@@ -41,7 +53,7 @@ class PipeLine:
         )
         # image_path = "/home/angelo/ros2_ws/VAR/assets/voetbalveld.jpg"
         if self.config["show_live_map"]:
-            self.live_map = LiveMap(image_path)
+            self.live_map = LiveMap(image_path, config_path)
 
     def run(self, cv_image, loc, pose):
         if self.config.get("detect_marker"):

@@ -73,11 +73,13 @@ class CurlingNode(Node):
         # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         np_arr = np.frombuffer(msg.data, np.uint8)
         cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        action = self.pipeline(cv_image)
+        action = self.pipeline(cv_image, self.loc, self.pose)
         self.queue.append(action)
 
     def joint_state_callback(self, msg):
         self.loc, self.pose = self.wheel_odometry.joint_state_callback(msg)
+        # action = self.pipeline(cv2.imread("/home/angelo/ros2_ws/VAR/assets/image.jpeg"), self.loc, self.pose)
+        # self.cmd_vel_pub.publish(action )
 
     def timer_callback(self):
         if self.config["print_wheel_values"]:
