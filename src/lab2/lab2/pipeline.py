@@ -4,19 +4,20 @@ import numpy as np
 from typing import Dict
 import textwrap
 from IPython import get_ipython
-from .live_map import LiveMap
 
 try:
     if "get_ipython" in globals() and "IPKernelApp" in get_ipython().config:
         from marker_detection import MarkerDetection
         from localization import Localization
-        from robot_detection import RobotDetection
+        from goodrobotdetection import RobotDetection
         from movement_contoller import MovementController
+        from live_map import LiveMap
 except AttributeError:
     from .marker_detection import MarkerDetection
     from .localization import Localization
-    from .robot_detection import RobotDetection
+    from .goodrobotdetection import RobotDetection
     from .movement_contoller import MovementController
+    from .live_map import LiveMap
 
 
 class PipeLine:
@@ -52,9 +53,8 @@ class PipeLine:
             if location is not None and self.config["show_live_map"]:
                 self.live_map.update_plot(location)
 
-            if self.config.get("debug") > 2:
+            if self.config.get("debug") > 0:
                 print(f"Location: {location}")
-            print(f"Location: {location}")
 
             if self.config.get("save_images"):
                 os.makedirs("marker_images", exist_ok=True)
@@ -65,31 +65,19 @@ class PipeLine:
                 )
 
         if self.config.get("detect_robot"):
-            # Empty lists when no object has been detected
-            # Else e.g in_dangers = [False, True, False] and approx_distances = [3, 1.5, 4] (cm's)
             in_dangers, left_middle_right_set = self.robot_detector.detect(cv_image)
-
-            # if self.config.get("debug") > 2:
-            #     print(f"Robot detection: {img}, {mask}")
-
-            # if self.config.get("save_images"):
-            #     os.makedirs("robot_images", exist_ok=True)
-            #     cv2.imwrite(f"robot_images/{self.frame_nmbr}.jpg", img)
-            #     cv2.imwrite(f"robot_images/{self.frame_nmbr}_mask.jpg", mask)
+            if self.config.get("debug") > 0:
+                print(f"Robot detection: {in_dangers}, {left_middle_right_set}")
         else:
             in_dangers = False
             left_middle_right_set = None
-        # inDanger, distances = False, None
-        # if self.config.get("avoid_obstacles"):
-        #     in_dangers, approx_distances = self.object_detector.detect(cv_image)
+
         cmd = self.movement_controller.move_to_target(
             location, (in_dangers, left_middle_right_set), pose
-        )  # TODO false, set should be replaced by the output of robot detector
+        )
         if self.config.get("save_images"):
             self.save_movement_image(marker_detection_results["frame"], cmd)
         self.frame_nmbr += 1
-        # cmd.linear.x = 0.0
-        # cmd.angular.z = 0.0
         return cmd
 
     def save_movement_image(self, cv_image, cmd):

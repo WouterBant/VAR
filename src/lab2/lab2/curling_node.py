@@ -1,9 +1,11 @@
 import rclpy
 from rclpy.node import Node
+import numpy as np
+import cv2
 import os
 import yaml
 from .pipeline import PipeLine
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
@@ -17,18 +19,18 @@ class CurlingNode(Node):
 
         self.load_config()
         self.pipeline = PipeLine(config=self.config)
-        # self.image_sub = self.create_subscription(
-        #     CompressedImage,
-        #     "/rae/right/image_raw/compressed",
-        #     self.image_callback,
-        #     10,
-        # )
         self.image_sub = self.create_subscription(
-            Image,
-            "/rae/right/image_raw",
+            CompressedImage,
+            "/rae/right/image_raw/compressed",
             self.image_callback,
             10,
         )
+        # self.image_sub = self.create_subscription(
+        #     Image,
+        #     "/rae/right/image_raw",
+        #     self.image_callback,
+        #     10,
+        # )
 
         self.joint_state_sub = self.create_subscription(
             DynamicJointState,
@@ -39,10 +41,10 @@ class CurlingNode(Node):
 
         self.left_wheel_value = None
         self.right_wheel_value = None
+        self.want_to_stop = 0
 
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)
         self.bridge = CvBridge()
-        self.delay = 0
 
         self.queue: Deque[Twist] = Deque(maxlen=5)
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -68,13 +70,10 @@ class CurlingNode(Node):
             self.config = yaml.safe_load(file)
 
     def image_callback(self, msg):
-        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        # np_arr = np.frombuffer(msg.data, np.uint8)
-        # cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        self.delay += 1
-        if self.delay % 4 != 0:
-            return
-        action = self.pipeline(cv_image, self.loc, self.pose)
+        # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        np_arr = np.frombuffer(msg.data, np.uint8)
+        cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        action = self.pipeline(cv_image)
         self.queue.append(action)
 
     def joint_state_callback(self, msg):
@@ -93,10 +92,15 @@ class CurlingNode(Node):
         average_angular = sum(i.angular.z for i in self.queue) / len(self.queue)
         self.queue.clear()
         twist_msg = Twist()
-        # if average_linear == 0:
-        #     assert 1 == 2
         twist_msg.linear.x = average_linear  # Forward/backward
         twist_msg.angular.z = average_angular  # Rotation angle per second
+        print(f"Linear: {twist_msg.linear.x}, Angular: {twist_msg.angular.z}")
+        if average_linear == 0:
+            self.want_to_stop += 1
+            if self.want_to_stop > 5:
+                assert 1 == 2
+        else:
+            self.want_to_stop = 0
         self.cmd_vel_pub.publish(twist_msg)
 
 

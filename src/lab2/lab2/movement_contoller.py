@@ -35,7 +35,7 @@ class MovementController:
         """
         is_danger, danger_positions = obstacle_detection
 
-        if current_pos is None:  # TODO maybe not but prevents circles
+        if current_pos is None:
             cmd = Twist()
             cmd.linear.x = 0.5
             cmd.angular.z = 0.0
@@ -45,11 +45,15 @@ class MovementController:
         dx = self.config.get("target_x_location") - current_pos[0]
         dy = self.config.get("target_y_location") - current_pos[1]
 
-        if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
-            cmd = Twist()
-            return cmd
+        # if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
+        #     cmd = Twist()
+        #     return cmd  TODO think about what happens when we are past the line
 
         distance = math.sqrt(dx * dx + dy * dy)
+        if distance < self.position_tolerance:
+            # self._publish_stop()
+            assert 1 == 2  # TODO maybe finetune this value or above
+
         target_angle = np.degrees(math.atan2(dy, -dx))
         use_angle = pose - target_angle
 
@@ -59,11 +63,6 @@ class MovementController:
             print(f"Use angle: {use_angle}")
 
         cmd = Twist()
-
-        # If we're close enough to target, stop
-        if distance < self.position_tolerance:
-            self._publish_stop()
-            return
 
         # Handle dangerous situations first
         if is_danger:
@@ -79,7 +78,7 @@ class MovementController:
 
         # If danger is directly ahead, prioritize avoiding it
         if "middle" in danger_positions:
-            cmd.linear.x = 0.75  # Move forward slowly
+            cmd.linear.x = 0.2  # Move forward slowly
 
             # Choose escape direction based on target angle and available space
             if "left" not in danger_positions and "right" in danger_positions:
@@ -118,7 +117,7 @@ class MovementController:
         cmd.linear.x = self._get_linear_velocity(distance)
 
         # Reduce forward speed if any dangers detected
-        if len(danger_positions) > 0:
+        if danger_positions is not None and len(danger_positions) > 0:
             cmd.linear.x *= self.danger_slow_factor
         cmd.angular.z = self._get_angular_velocity(target_angle)
 
@@ -131,24 +130,14 @@ class MovementController:
 
         return cmd
 
-    def _normalize_angle(self, angle):
-        """Normalize angle to [-pi, pi]"""
-        while angle > math.pi:
-            angle -= 2 * math.pi
-        while angle < -math.pi:
-            angle += 2 * math.pi
-        return angle
-
     def _get_linear_velocity(self, distance):
         """Get linear velocity based on distance to target"""
-        # Simple proportional control
-        kp = 0.5
+        kp = self.config.get("linear_kp")
         return kp * distance
 
     def _get_angular_velocity(self, angle_diff):
         """Get angular velocity based on heading difference"""
-        # Simple proportional control
-        kp = 1 / 18  # TODO tune this more if needed
+        kp = self.config.get("angular_kp")
         return kp * angle_diff
 
     def _publish_stop(self):

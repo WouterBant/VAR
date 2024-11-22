@@ -21,20 +21,15 @@ class Localization:
 
     def triangulate(self, marker_detection_results):
         if len(marker_detection_results["marker_ids"]) < 2:
-            return None, None  # TODO maybe not
-            # return self.previous_location, self.previous_pose
+            return None, None
 
         position = self.triangulate_2d_ls(marker_detection_results)
         poses = self.estimate_pose(marker_detection_results, position)
 
         if len(poses) == 0:
             return None, None
-            # return self.previous_location, self.previous_pose
 
         average_pose = sum(poses) / len(poses)
-        # if np.sqrt(np.sum((self.previous_location - position)**2)) > 50 or random.uniform() > 0.7:
-        #     return None, None
-
         self.previous_location = position
         self.previous_pose = average_pose
         return position, average_pose

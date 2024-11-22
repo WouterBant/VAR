@@ -29,133 +29,6 @@ class MarkerDetection:
             print(f"Setting {key} to {value}")
             setattr(aruco_params, key, value)
 
-    def undistort_image(self, img, K, dist_coeffs, model="default"):
-        h, w = img.shape[:2]
-
-        if model == "default":
-            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
-                K, dist_coeffs, (w, h), 1, (w, h)
-            )
-            undistorted = cv2.undistort(img, K, dist_coeffs, None, new_camera_matrix)
-        elif model == "rational":
-            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
-                K, dist_coeffs, (w, h), 1, (w, h)
-            )
-            map1, map2 = cv2.initUndistortRectifyMap(
-                K, dist_coeffs, None, new_camera_matrix, (w, h), cv2.CV_16SC2
-            )
-            undistorted = cv2.remap(img, map1, map2, cv2.INTER_LANCZOS4)
-
-        elif model == "thin_prism":
-            new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
-                K, dist_coeffs, (w, h), 1, (w, h)
-            )
-            scale_factor = 1.0
-            scaled_K = K.copy()
-            scaled_K[0, 0] *= scale_factor
-            scaled_K[1, 1] *= scale_factor
-            scaled_new_camera_matrix = new_camera_matrix.copy()
-            scaled_new_camera_matrix[0, 0] *= scale_factor
-            scaled_new_camera_matrix[1, 1] *= scale_factor
-
-            map1, map2 = cv2.initUndistortRectifyMap(
-                scaled_K,
-                dist_coeffs,
-                None,
-                scaled_new_camera_matrix,
-                (int(w * scale_factor), int(h * scale_factor)),
-                cv2.CV_32FC1,
-            )
-            undistorted = cv2.remap(
-                img, map1, map2, cv2.INTER_LANCZOS4, borderMode=cv2.BORDER_REFLECT_101
-            )
-        else:
-            raise ValueError(
-                "Invalid rectification model. Choose 'default', 'rational', or 'thin_prism'."
-            )
-        x, y, w, h = roi
-        undistorted = undistorted[y : y + h, x : x + w]
-        return undistorted
-
-    def _undistort_image(self, img):
-        if self.config.get("undistort_method") == "default":
-            img = self.undistort_image(
-                img,
-                np.array(
-                    [
-                        [290.46301, 0.0, 312.90291],
-                        [0.0, 290.3703, 203.01488],
-                        [0.0, 0.0, 1.0],
-                    ]
-                ),
-                np.array(
-                    [-2.79797e-01, 6.43090e-02, -6.80000e-05, 1.96700e-03, 0.00000e00]
-                ),
-            )
-        elif self.config.get("undistort_method") == "rational":
-            img = self.undistort_image(
-                img,
-                np.array(
-                    [
-                        [273.20605262, 0.0, 320.87089782],
-                        [0.0, 273.08427035, 203.25003755],
-                        [0.0, 0.0, 1.0],
-                    ]
-                ),
-                np.array(
-                    [
-                        [
-                            -0.14005281,
-                            -0.1463477,
-                            -0.00050158,
-                            0.00081933,
-                            0.00344204,
-                            0.17342913,
-                            -0.26600101,
-                            -0.00599146,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                        ]
-                    ]
-                ),
-                model="rational",
-            )
-        elif self.config.get("undistort_method") == "thin_prism":
-            img = self.undistort_image(
-                img,
-                np.array(
-                    [
-                        [274.61629303, 0.0, 305.28148118],
-                        [0.0, 274.71260003, 192.29090248],
-                        [0.0, 0.0, 1.0],
-                    ]
-                ),
-                np.array(
-                    [
-                        [
-                            -0.29394562,
-                            0.11084073,
-                            -0.00548286,
-                            -0.00508527,
-                            -0.02123716,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.019926,
-                            -0.00193285,
-                            0.01534379,
-                            -0.00206454,
-                        ]
-                    ]
-                ),
-                model="thin_prism",
-            )
-        return img
-
     # def get_camera_direction(self, rvecs, tvecs):
     #     # Convert rotation vector to rotation matrix
     #     rmat, _ = cv2.Rodrigues(rvecs[0])
@@ -370,10 +243,11 @@ class MarkerDetection:
             plt.imshow(rgb_frame)
             plt.show()
         else:
-            cv2.imshow("Frame", frame)
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord("q"):
-                cv2.destroyAllWindows()
+            pass
+            # cv2.imshow("Frame", frame)
+            # key = cv2.waitKey(1) & 0xFF
+            # if key == ord("q"):
+            #     cv2.destroyAllWindows()
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         return {

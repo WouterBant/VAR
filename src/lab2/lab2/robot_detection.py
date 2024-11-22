@@ -79,6 +79,7 @@ class RobotDetection:
         in_dangers = []
         approx_distances = []
         left_middle_right_set = []
+
         # Draw bounding boxes around detected ducks on the original image
         for contour in contours:
             contour_area = cv2.contourArea(contour)
@@ -130,8 +131,12 @@ class RobotDetection:
                 if show_live_detection:
                     cv2.imshow("Robot Detection", image_copy)
                     cv2.waitKey(1)  # Ensure the window updates properly
-                    cv2.imshow("Mask Robot", mask)
-                    cv2.waitKey(1)  # Ensure the window updates properly
+                    # cv2.imshow("Mask Robot", mask)
+                    # cv2.waitKey(1)  # Ensure the window updates properly
+            else:
+                cv2.drawContours(image_copy, [contour], -1, (0, 0, 255), 2)
+                cv2.drawContours(mask, [contour], -1, (0, 0, 255), 2)
+                cv2.imshow("Robot Detection", image_copy)
 
         # This structure is a bit weird when determine in_danger, but might be useful for later
         # If we want to distinguish between multiple robots.
