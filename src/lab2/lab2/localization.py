@@ -23,7 +23,10 @@ class Localization:
         if len(marker_detection_results["marker_ids"]) < 2:
             return None, None
 
-        position = self.triangulate_2d_ls(marker_detection_results)
+        if len(marker_detection_results["marker_ids"]) == 2:
+            position = self.triangulate_exact(marker_detection_results)
+        else:   
+            position = self.triangulate_2d_ls(marker_detection_results)
         poses = self.estimate_pose(marker_detection_results, position)
 
         if len(poses) == 0:
@@ -43,8 +46,8 @@ class Localization:
             estimated_distances = np.linalg.norm(landmarks - camera_position, axis=1)
             return estimated_distances - distances
 
-        initial_guess = self.previous_location
-
+        initial_guess = self.previous_location  #np.array([0.0,0.0])  # TODO maybe self.previous_location
+        # initial_guess = np.array([0.0, 0.0])
         landmarks = np.array(
             [
                 [location.x, location.y]
@@ -63,6 +66,10 @@ class Localization:
             ]
         )
 
+
+        print(landmarks, "l")
+        print(distances, "d")
+
         result = least_squares(
             residuals,
             initial_guess,
@@ -71,6 +78,9 @@ class Localization:
             xtol=1e-10,
             gtol=1e-10,
         )
+
+        if abs(result.x[0]) > 300 or abs(result.x[1]) > 450:
+            return self.previous_location
 
         return result.x
 
@@ -152,7 +162,7 @@ class Localization:
             )
             estimated_distances = np.linalg.norm(landmarks - camera_position, axis=1)
             return estimated_distances - distances
-
+        # initial_guess = np.array([0.0, 0.0])
         initial_guess = self.previous_location
 
         assert all(
@@ -177,6 +187,7 @@ class Localization:
             xtol=1e-10,
             gtol=1e-10,
         )
+        self.previous_location = result.x
         return result.x
 
     def triangulate_exact(self, marker_detection_results):
@@ -257,6 +268,9 @@ class Localization:
             dist1 = np.linalg.norm(point1 - self.previous_location)
             dist2 = np.linalg.norm(point2 - self.previous_location)
             result = point1 if dist1 < dist2 else point2
+        
+        if abs(result[0]) > 300 or abs(result[1]) > 450:
+            return self.previous_location
 
         return result
 

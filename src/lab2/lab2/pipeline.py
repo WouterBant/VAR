@@ -56,6 +56,8 @@ class PipeLine:
             in_dangers, left_middle_right_set = self.robot_detector.detect(cv_image)
             if self.config.get("debug") > 0:
                 print(f"Robot detection: {in_dangers}, {left_middle_right_set}")
+                if in_dangers:
+                    print("FUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\n\n")
         else:
             in_dangers = False
             left_middle_right_set = None
@@ -64,21 +66,15 @@ class PipeLine:
             location, (in_dangers, left_middle_right_set), pose
         )
         if self.config.get("save_images"):
-            self.save_movement_image(marker_detection_results["frame"], cmd)
+            self.save_movement_image(marker_detection_results["frame"], cmd, pose)
         self.frame_nmbr += 1
         return cmd
 
-    def save_movement_image(self, cv_image, cmd):
+    def save_movement_image(self, cv_image, cmd, pose):
         os.makedirs("movement_images", exist_ok=True)
-        title = (
-            f"Linear: {cmd.linear.x:.2f}, "
-            f"Angular: {cmd.angular.z:.2f},\n"
-            f"Current Position: {self.localization.previous_location},\n"
-            f"Target Position: ({self.config.get('target_x_location')}, {self.config.get('target_y_location')})"
-        )
         font, font_scale, thickness = cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1
         title = (
-            f"Linear: {cmd.linear.x:.2f}, Angular: {cmd.angular.z:.2f}, "
+            f"Linear: {cmd.linear.x:.2f}, Angular: {cmd.angular.z:.2f}, Pose: {pose}\n"
             f"Current Position: {self.localization.previous_location.tolist()}, "
             f"Target Position: ({self.config.get('target_x_location')}, {self.config.get('target_y_location')})"
         )

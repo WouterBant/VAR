@@ -5,7 +5,7 @@ import cv2
 import os
 import yaml
 from .pipeline import PipeLine
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import CompressedImage, Image
 from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
@@ -22,7 +22,7 @@ class CurlingNode(Node):
             CompressedImage,
             "/rae/right/image_raw/compressed",
             self.image_callback,
-            10,
+            2,
         )
         # self.image_sub = self.create_subscription(
         #     Image,
@@ -46,7 +46,7 @@ class CurlingNode(Node):
         self.bridge = CvBridge()
 
         self.queue: Deque[Twist] = Deque(maxlen=5)
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        self.timer = self.create_timer(1.05, self.timer_callback)
 
     def load_config(self):
         config_path = os.path.join(

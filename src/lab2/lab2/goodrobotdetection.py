@@ -177,7 +177,7 @@ class RobotDetection:
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         return contours
 
-    def get_contour_info(self, contours, min_width=50):
+    def get_contour_info(self, contours, min_width=35):
         """
         For each contour, check if the bottom line width is greater than `min_width`.
         If so, calculate the middle of the contour, its width, and its height.
@@ -213,6 +213,8 @@ class RobotDetection:
         for middle_x, y, width, height in contours_info:
             if y > height_frame // 2:
                 in_danger = True
+            if y > height_frame / 1.2 and width > 100:
+                assert 1 == 2, "stop robot"
             if y > height_frame // 4:
                 if middle_x in range(0, left_range):
                     positions_danger.add("left")

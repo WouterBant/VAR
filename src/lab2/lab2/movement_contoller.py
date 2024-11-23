@@ -21,6 +21,8 @@ class MovementController:
             "escape_turn_speed"
         )  # rad/s for escape maneuvers
 
+        self.new_location = False
+
     def move_to_target(
         self, current_pos, obstacle_detection: Tuple[bool, Set[str]], pose: float
     ):
@@ -37,19 +39,32 @@ class MovementController:
 
         if current_pos is None:
             cmd = Twist()
-            cmd.linear.x = 0.5
+            cmd.linear.x = 0.1
             cmd.angular.z = 0.0
             return cmd
 
         # Calculate basic movement parameters
-        dx = self.config.get("target_x_location") - current_pos[0]
-        dy = self.config.get("target_y_location") - current_pos[1]
+        if not self.new_location: 
+            dx = self.config.get("target_x_location") - current_pos[0]
+            dy = self.config.get("target_y_location") - current_pos[1]
+        else:
+            dx = self.config.get("new_target_x_location") - current_pos[0]
+            dy = self.config.get("new_target_y_location") - current_pos[1]
 
         # if dy < 0:  # TODO stop if we are over the horizontal line (we dont drive back)
         #     cmd = Twist()
         #     return cmd  TODO think about what happens when we are past the line
 
+        if dy < 0:
+            assert 1 == 2  # TODO maybe finetune this value or above
+
         distance = math.sqrt(dx * dx + dy * dy)
+        print(f"Distance: {distance}")
+        if not self.new_location and distance < self.position_tolerance:
+            self.new_location = True
+            cmd = Twist()
+            return cmd
+
         if distance < self.position_tolerance:
             # self._publish_stop()
             assert 1 == 2  # TODO maybe finetune this value or above
@@ -78,7 +93,7 @@ class MovementController:
 
         # If danger is directly ahead, prioritize avoiding it
         if "middle" in danger_positions:
-            cmd.linear.x = 0.2  # Move forward slowly
+            cmd.linear.x = 0.1  # Move forward slowly
 
             # Choose escape direction based on target angle and available space
             if "left" not in danger_positions and "right" in danger_positions:

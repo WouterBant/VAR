@@ -19,9 +19,6 @@ class MarkerDetection:
 
     def _initialize_aruco_params(self):
         aruco_params = cv2.aruco.DetectorParameters()
-        aruco_params.adaptiveThreshWinSizeMin = 3
-        aruco_params.maxMarkerPerimeterRate = 4.0
-        aruco_params.polygonalApproxAccuracyRate = 0.04
         if not self.config.get("use_custom_detector_parameters"):
             return aruco_params
         detector_config = self.config.get("detector_parameters", {})
@@ -193,16 +190,34 @@ class MarkerDetection:
                     #     print(f"skipping marker {marker_id[0]}")
                     #     continue
 
-                    all_corners.extend(marker_corner)
+                    if tvecs[0][0][2] < MARKER_ID_2_LOCATION[marker_id[0]].z:
+                        print(f"skipping marker {marker_id[0]}")
+                        continue
+
+                    distance_ground = np.sqrt(
+                        tvecs[0][0][2]**2 - MARKER_ID_2_LOCATION[marker_id[0]].z ** 2
+                    )
+
+                    if abs(tvecs[0][0][0]) > distance_ground:
+                        print(f"skipping marker {marker_id[0]}")
+                        print('h')
+                        continue
+
+                    all_corners.append(marker_corner[0])
                     all_marker_ids.append(marker_id[0])
                     all_tvecs.append(tvecs[0][0])
-                    all_distances.append(
-                        np.linalg.norm(tvecs)
-                    )  # TODO this seems to work better
-                    all_rvecs.append(rvecs[0][0])
                     # all_distances.append(
-                    # tvecs[0][0][2]
-                    # )  # TODO maybe this is good or the above
+                    #     np.linalg.norm(tvecs)
+                    # )  # TODO this seems to work better
+                    all_rvecs.append(rvecs[0][0])
+
+                    all_distances.append(
+                        tvecs[0][0][2]
+                    )  # TODO maybe this is good or the above
+                    print("marker id: ", marker_id[0])
+                    print("size: ", marker_size)
+                    print("estimated distance: ", tvecs[0][0][2])
+                    print(np.linalg.norm(tvecs))
                     all_sizes.append(marker_size)
 
         if self.config.get("notebook_display"):

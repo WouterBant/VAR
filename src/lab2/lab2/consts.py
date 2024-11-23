@@ -21,7 +21,7 @@ POSITIONS: List[Dict[str, Any]] = [
     {"height": 8, "code": "36h11-19", "z": 51.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -184, "x": -502, "ids": [3, 151, 19]},
     {"height": 20.5, "code": "7x7-37", "z": 98.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -95.5, "x": -502, "ids": [37, 95]},
     {"height": 8, "code": "36h11-29", "z": 50.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 9.5, "x": -502, "ids": [29]},
-    {"height": 27.5, "code": "36h11-8", "z": 104.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 9.5, "x": -502, "ids": [8, 82]},
+    {"height": 27.5, "code": "36h11-8", "z": 104.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 9.5, "x": -502, "ids": [8]},
     {"height": 20.5, "code": "7x7-27", "z": 99.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 295, "x": -502, "ids": [1, 27, 60, 108, 574]},
     {"height": 23.5, "code": "36h11-36", "z": 106.9-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 394, "x": -502, "ids": [36]},
     {"height": 8, "code": "36h11-59", "z": 51-ROBOT_CAMERA_OFFSET, "y": 186.5, "x": -313, "ids": [14, 59]},  # gras
@@ -35,14 +35,14 @@ POSITIONS: List[Dict[str, Any]] = [
     {"height": 20.5, "code": "36h12-47", "z": 96.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -97, "x": 421.5, "ids": [47]},
     {"height": 8, "code": "36h11-9", "z": 47.8-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -176.6, "x": 408.5, "ids": [9, 112]},
     {"height": 23.5, "code": "36h11-66", "z": 106.4-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -295.5, "x": 421.5, "ids": [66]},
-    {"height": 8, "code": "36h11-39", "z": 49.2-ROBOT_CAMERA_OFFSET, "y": -446.4, "x": 80, "ids": [39]},  # gras
-    {"height": 8, "code": "36h11-49", "z": 49.5-ROBOT_CAMERA_OFFSET, "y": -445.2, "x": -78, "ids": [49, 213]},  # gras
+    # {"height": 8, "code": "36h11-39", "z": 49.2-ROBOT_CAMERA_OFFSET, "y": -446.4, "x": 80, "ids": [39]},  # gras
+    # {"height": 8, "code": "36h11-49", "z": 49.5-ROBOT_CAMERA_OFFSET, "y": -445.2, "x": -78, "ids": [49, 213]},  # gras
     {"height": 20.5, "code": "36h12-57", "z": 100-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [57]},	
-    {"height": 23.5, "code": "36h11-46", "z": 165.6-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [46]},
+    # {"height": 23.5, "code": "36h11-46", "z": 165.6-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [46]},
     {"height": 20.5, "code": "7x7-7", "z": 97.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 553.2, "x": -48, "ids": [7]},	
-    {"height": 23.5, "code": "36h11-56", "z": 164-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 553.2, "x": -48, "ids": [4, 56]},
-    {"height": 23.5, "code": "36h11-25", "z": 97.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 561.2, "x": 127.5, "ids": [25]},
-    {"height": 23.5, "code": "36h11-35", "z": 164-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 576.2, "x": -201.5, "ids": [35]},
+    {"height": 23, "code": "36h11-56", "z": 164-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 553.2, "x": -48, "ids": [4, 56]},
+    {"height": 23, "code": "36h11-25", "z": 104-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 560, "x": 127.5, "ids": [25]},
+    {"height": 23, "code": "36h11-35", "z": 97.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 576.2, "x": -201.5, "ids": [35]},
 ]
 
 @dataclass
