@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
 
 class RobotDetection:
     def __init__(self, config):
@@ -240,6 +240,10 @@ class RobotDetection:
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 cv2.destroyAllWindows()
+            if self.config.get("save_robot_detection_images"):
+                os.makedirs("robot_detection_images", exist_ok=True)
+                cv2.imwrite(f"robot_detection_images/{self.counter}.jpg", frame)
+                self.counter += 1
         else:
             plt.imshow(self.draw_contours(frame, contours))
             plt.show()

@@ -55,13 +55,20 @@ class MovementController:
         #     cmd = Twist()
         #     return cmd  TODO think about what happens when we are past the line
 
-        if dy < 0:
+        if dy < 0 and self.new_location:
             assert 1 == 2  # TODO maybe finetune this value or above
 
+        if dy < 0 and not self.new_location:
+            print("SWITCING TARGET\n\n\n\n\n\n\n")
+            self.new_location = True
+            cmd = Twist()
+            return cmd
+        
         distance = math.sqrt(dx * dx + dy * dy)
         print(f"Distance: {distance}")
         if not self.new_location and distance < self.position_tolerance:
             self.new_location = True
+            print("SWITCING TARGET\n\n\n\n\n\n\n")
             cmd = Twist()
             return cmd
 
