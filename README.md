@@ -43,4 +43,14 @@ ros2 run lab2 curling
 
 
 ## Lab 3:
-Note: ros2 pkg create --build-type ament_python --node-name my_node lab3 in the src folder
+[Config file](configs/lab3/config.yaml)
+
+Build with:
+```bash
+colcon build --packages-select lab3
+```
+
+Run with:
+```bash
+ros2 run lab3 my_node
+```
