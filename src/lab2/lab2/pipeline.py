@@ -30,13 +30,18 @@ class PipeLine:
         self.robot_detector = RobotDetection(config=self.config)
         self.movement_controller = MovementController(config=self.config)
         self.frame_nmbr = 0
-        
+
         # Init Kalman Filter
-        initial_state = (self.config['initial_x_location'], self.config['initial_y_location'])
+        initial_state = (
+            self.config["initial_x_location"],
+            self.config["initial_y_location"],
+        )
         process_noise = np.diag([0.1, 0.1, np.deg2rad(1)])
         measurement_noise = np.diag([0.5, 0.5])
-        self.wheelbase = 0.095 # meters
-        self.kalman_filter = KalmanFilter2D(initial_state, process_noise, measurement_noise)
+        self.wheelbase = 0.095  # meters
+        self.kalman_filter = KalmanFilter2D(
+            initial_state, process_noise, measurement_noise
+        )
 
         config_path = os.path.join(
             os.path.dirname(__file__),

@@ -17,12 +17,8 @@ class WheelOdometryNode(Node):
         self.WHEEL_BASE = 0.095  # distance between wheel centers in meters
 
         # Scaling factors, to fix movement/rotation speed
-        self.ROTATION_SCALE = (
-            0.2
-        )
-        self.MOVEMENT_SCALE = (
-            0.313479624 / 2
-        )
+        self.ROTATION_SCALE = 0.2
+        self.MOVEMENT_SCALE = 0.313479624 / 2
 
         image_path = os.path.join(
             os.path.dirname(__file__),

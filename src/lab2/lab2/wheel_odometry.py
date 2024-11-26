@@ -9,12 +9,8 @@ class WheelOdometry:
         self.WHEEL_BASE = 0.095  # distance between wheel centers in meters
 
         # Scaling factors, to fix movement/rotation speed
-        self.ROTATION_SCALE = (
-            0.2
-        )
-        self.MOVEMENT_SCALE = (
-            0.313479624 / 2
-        )
+        self.ROTATION_SCALE = 0.2
+        self.MOVEMENT_SCALE = 0.313479624 / 2
 
         # State variables
         self.last_left_wheel_value = None
@@ -68,4 +64,8 @@ class WheelOdometry:
         self.last_left_wheel_value = left_wheel_value
         self.last_right_wheel_value = right_wheel_value
 
-        return (self.current_x, self.current_y), 180 * abs(self.current_theta - math.pi), (left_distance, right_distance)
+        return (
+            (self.current_x, self.current_y),
+            180 * abs(self.current_theta - math.pi),
+            (left_distance, right_distance),
+        )
