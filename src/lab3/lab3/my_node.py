@@ -1,7 +1,5 @@
 import rclpy
 from rclpy.node import Node
-import numpy as np
-import cv2
 import os
 import yaml
 from sensor_msgs.msg import CompressedImage, Image
@@ -61,8 +59,9 @@ class CurlingNode(Node):
             self.config = yaml.safe_load(file)
 
     def image_callback(self, msg):
-        np_arr = np.frombuffer(msg.data, np.uint8)
-        cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        pass
+        # np_arr = np.frombuffer(msg.data, np.uint8)
+        # cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         # Do something with the image and get an action
         # self.queue.append(action)
 
