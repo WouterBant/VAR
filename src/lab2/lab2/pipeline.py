@@ -12,12 +12,14 @@ try:
         from goodrobotdetection import RobotDetection
         from movement_contoller import MovementController
         from live_map import LiveMap
+        from kalman_filter import KalmanFilter2D
 except AttributeError:
     from .marker_detection import MarkerDetection
     from .localization import Localization
     from .goodrobotdetection import RobotDetection
     from .movement_contoller import MovementController
     from .live_map import LiveMap
+    from .kalman_filter import KalmanFilter2D
 
 
 class PipeLine:
@@ -28,6 +30,13 @@ class PipeLine:
         self.robot_detector = RobotDetection(config=self.config)
         self.movement_controller = MovementController(config=self.config)
         self.frame_nmbr = 0
+        
+        # Init Kalman Filter
+        initial_state = (self.config['initial_x_location'], self.config['initial_y_location'])
+        process_noise = np.diag([0.1, 0.1, np.deg2rad(1)])
+        measurement_noise = np.diag([0.5, 0.5])
+        self.wheelbase = 0.095 # meters
+        self.kalman_filter = KalmanFilter2D(initial_state, process_noise, measurement_noise)
 
         config_path = os.path.join(
             os.path.dirname(__file__),
@@ -40,7 +49,7 @@ class PipeLine:
             "lab2",
             "config.yaml",
         )
-        # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
+
         image_path = os.path.join(
             os.path.dirname(__file__),
             "..",
@@ -51,16 +60,22 @@ class PipeLine:
             "assets",
             "voetbalveld.jpg",
         )
-        # image_path = "/home/angelo/ros2_ws/VAR/assets/voetbalveld.jpg"
+
         if self.config["show_live_map"]:
             self.live_map = LiveMap(image_path, config_path)
 
-    def run(self, cv_image, loc, pose):
+    def run(self, cv_image, d_left_right_o):
         if self.config.get("detect_marker"):
             marker_detection_results = self.marker_detector.detect(cv_image)
-            location, pose_ = self.localization.triangulate(marker_detection_results)
+            location_t, pose_t = self.localization.triangulate(marker_detection_results)
 
-            location = loc
+            # d_left, d_right = d_left_right_o
+            # self.kalman_filter.predict(d_left, d_right, self.wheelbase)
+            # self.kalman_filter.update(location_t)
+            # location = self.kalman_filter.get_state()
+
+            pose = pose_t
+            location = location_t
 
             if location is not None and self.config["show_live_map"]:
                 self.live_map.update_plot(location)
@@ -81,7 +96,7 @@ class PipeLine:
             if self.config.get("debug") > 0:
                 print(f"Robot detection: {in_dangers}, {left_middle_right_set}")
                 if in_dangers:
-                    print("FUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\n\n")
+                    print("Robot detected\n\n")
         else:
             in_dangers = False
             left_middle_right_set = None
@@ -128,5 +143,5 @@ class PipeLine:
             canvas,
         )
 
-    def __call__(self, cv_image, loc, pos):
-        return self.run(cv_image, loc, pos)
+    def __call__(self, cv_image, d_left_right):
+        return self.run(cv_image, d_left_right)

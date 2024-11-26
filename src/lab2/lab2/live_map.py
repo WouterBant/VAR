@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
-
-# import os
+import os
 import yaml
 import cv2
 
@@ -84,18 +83,18 @@ class LiveMap:
         self.fig.canvas.flush_events()  # Refresh the canvas to show updates
 
     def load_config(self, config_path):
-        # config_path = os.path.join(
-        #     os.path.dirname(__file__),
-        #     "..",
-        #     "..",
-        #     "..",
-        #     "..",
-        #     "..",
-        #     "configs",
-        #     "lab2",
-        #     "config.yaml",
-        # )
-        # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
+        config_path = os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "configs",
+            "lab2",
+            "config.yaml",
+        )
+
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
 

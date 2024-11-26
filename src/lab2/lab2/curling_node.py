@@ -50,13 +50,10 @@ class CurlingNode(Node):
         self.queue: Deque[Twist] = Deque(maxlen=5)
         self.timer = self.create_timer(1.05, self.timer_callback)
 
-        self.loc = (0, 0)
-        self.pose = 90
+        # self.loc = (0, 0)
+        # self.pose = 90
         self.wheel_odometry = WheelOdometry()
-
-        self.loc = (0, 0)
-        self.pose = 90
-        self.wheel_odometry = WheelOdometry()
+        self.d_left_right = (0, 0)
 
     def load_config(self):
         config_path = os.path.join(
@@ -70,28 +67,25 @@ class CurlingNode(Node):
             "lab2",
             "config.yaml",
         )
-        # config_path = "/home/angelo/ros2_ws/VAR/configs/lab2/config.yaml"
+
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
 
     def image_callback(self, msg):
-        # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         np_arr = np.frombuffer(msg.data, np.uint8)
         cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        action = self.pipeline(cv_image, self.loc, self.pose)
+        action = self.pipeline(cv_image, self.d_left_right)
         self.queue.append(action)
 
     def joint_state_callback(self, msg):
         self.loc, self.pose = self.wheel_odometry.joint_state_callback(msg)
-        # action = self.pipeline(cv2.imread("/home/angelo/ros2_ws/VAR/assets/image.jpeg"), self.loc, self.pose)
-        # self.cmd_vel_pub.publish(action )
 
     def timer_callback(self):
         if self.config["print_wheel_values"]:
             if self.left_wheel_value and self.right_wheel_value:
                 pass
-                # print(f"Left Wheel - Value: {self.left_wheel_value[0]}")
-                # print(f"Right Wheel - Value: {self.right_wheel_value[0]}")
+                print(f"Left Wheel - Value: {self.left_wheel_value[0]}")
+                print(f"Right Wheel - Value: {self.right_wheel_value[0]}")
 
         if len(self.queue) == 0:
             return
