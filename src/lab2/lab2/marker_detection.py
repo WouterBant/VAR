@@ -173,7 +173,7 @@ class MarkerDetection:
                             ]
                         ),
                     )
-                    
+
                     # print(rvecs.shape, tvecs.shape, marker_corner.shape)
                     # print(tvecs)
                     # print(self.get_camera_direction(rvecs, tvecs), "eeeeeee")
@@ -195,12 +195,12 @@ class MarkerDetection:
                         continue
 
                     distance_ground = np.sqrt(
-                        tvecs[0][0][2]**2 - MARKER_ID_2_LOCATION[marker_id[0]].z ** 2
+                        tvecs[0][0][2] ** 2 - MARKER_ID_2_LOCATION[marker_id[0]].z ** 2
                     )
 
                     if abs(tvecs[0][0][0]) > distance_ground:
                         print(f"skipping marker {marker_id[0]}")
-                        print('h')
+                        print("h")
                         continue
 
                     all_corners.append(marker_corner[0])

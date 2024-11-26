@@ -4,6 +4,7 @@ import numpy as np
 from typing import Set, Tuple
 from playsound import playsound
 
+
 class MovementController:
     def __init__(self, config):
         self.config = config
@@ -47,7 +48,7 @@ class MovementController:
             return cmd
 
         # Calculate basic movement parameters
-        if not self.new_location: 
+        if not self.new_location:
             dx = self.config.get("target_x_location") - current_pos[0]
             dy = self.config.get("target_y_location") - current_pos[1]
         else:
@@ -67,7 +68,7 @@ class MovementController:
             self.new_location = True
             cmd = Twist()
             return cmd
-        
+
         distance = math.sqrt(dx * dx + dy * dy)
         print(f"Distance: {distance}")
         if not self.new_location and distance < self.position_tolerance:

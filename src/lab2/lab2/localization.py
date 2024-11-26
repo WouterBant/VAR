@@ -25,7 +25,7 @@ class Localization:
 
         if len(marker_detection_results["marker_ids"]) == 2:
             position = self.triangulate_exact(marker_detection_results)
-        else:   
+        else:
             position = self.triangulate_2d_ls(marker_detection_results)
         poses = self.estimate_pose(marker_detection_results, position)
 
@@ -47,7 +47,9 @@ class Localization:
             estimated_distances = np.linalg.norm(landmarks - camera_position, axis=1)
             return estimated_distances - distances
 
-        initial_guess = self.previous_location  #np.array([0.0,0.0])  # TODO maybe self.previous_location
+        initial_guess = (
+            self.previous_location
+        )  # np.array([0.0,0.0])  # TODO maybe self.previous_location
         # initial_guess = np.array([0.0, 0.0])
         landmarks = np.array(
             [
@@ -66,7 +68,6 @@ class Localization:
                 )
             ]
         )
-
 
         print(landmarks, "l")
         print(distances, "d")
@@ -163,6 +164,7 @@ class Localization:
             )
             estimated_distances = np.linalg.norm(landmarks - camera_position, axis=1)
             return estimated_distances - distances
+
         # initial_guess = np.array([0.0, 0.0])
         initial_guess = self.previous_location
 
@@ -269,7 +271,7 @@ class Localization:
             dist1 = np.linalg.norm(point1 - self.previous_location)
             dist2 = np.linalg.norm(point2 - self.previous_location)
             result = point1 if dist1 < dist2 else point2
-        
+
         if abs(result[0]) > 300 or abs(result[1]) > 450:
             return self.previous_location
 

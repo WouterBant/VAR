@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from playsound import playsound
 
+
 class RobotDetection:
     def __init__(self, config):
         self.counter = 0
@@ -168,7 +169,9 @@ class RobotDetection:
 
         # Apply some morphological operations to clean up the mask
         # Erode to remove small black artifacts/ connect larger objects with dilate
-        mask = cv2.erode(mask, np.ones((9, 9), np.uint8), iterations=1)  # TODO 11 add this back
+        mask = cv2.erode(
+            mask, np.ones((9, 9), np.uint8), iterations=1
+        )  # TODO 11 add this back
         # mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=2)
 
         # Optionally, smooth the edges of the mask/ DO NOT THINK THIS HELPS

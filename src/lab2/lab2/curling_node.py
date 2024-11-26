@@ -5,7 +5,7 @@ import cv2
 import os
 import yaml
 from .pipeline import PipeLine
-from sensor_msgs.msg import CompressedImage, Image
+from sensor_msgs.msg import CompressedImage  # , Image
 from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist

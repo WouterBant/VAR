@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class KalmanFilter2D:
     def __init__(self, initial_state, process_noise, measurement_noise):
         self.state = np.array(initial_state)  # [x, y, theta]
