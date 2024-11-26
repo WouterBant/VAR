@@ -2,7 +2,7 @@ from geometry_msgs.msg import Twist
 import math
 import numpy as np
 from typing import Set, Tuple
-
+from playsound import playsound
 
 class MovementController:
     def __init__(self, config):
@@ -56,6 +56,7 @@ class MovementController:
         #     return cmd  TODO think about what happens when we are past the line
 
         if dy < 0 and self.new_location:
+            playsound(r"C:\Users\woute\sound.wav")
             assert 1 == 2  # TODO maybe finetune this value or above
 
         if dy < 0 and not self.new_location:
@@ -73,6 +74,7 @@ class MovementController:
             return cmd
 
         if distance < self.position_tolerance:
+            playsound(r"C:\Users\woute\sound.wav")
             # self._publish_stop()
             assert 1 == 2  # TODO maybe finetune this value or above
 

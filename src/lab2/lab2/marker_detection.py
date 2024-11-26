@@ -173,7 +173,7 @@ class MarkerDetection:
                             ]
                         ),
                     )
-
+                    
                     # print(rvecs.shape, tvecs.shape, marker_corner.shape)
                     # print(tvecs)
                     # print(self.get_camera_direction(rvecs, tvecs), "eeeeeee")

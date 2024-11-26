@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from playsound import playsound
 
 class RobotDetection:
     def __init__(self, config):
@@ -167,7 +168,7 @@ class RobotDetection:
 
         # Apply some morphological operations to clean up the mask
         # Erode to remove small black artifacts/ connect larger objects with dilate
-        mask = cv2.erode(mask, np.ones((11, 11), np.uint8), iterations=1)
+        mask = cv2.erode(mask, np.ones((9, 9), np.uint8), iterations=1)  # TODO 11 add this back
         # mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=2)
 
         # Optionally, smooth the edges of the mask/ DO NOT THINK THIS HELPS
@@ -214,6 +215,7 @@ class RobotDetection:
             if y > height_frame // 2:
                 in_danger = True
             if y > height_frame / 1.2 and width > 100:
+                playsound(r"C:\Users\woute\sound.wav")
                 assert 1 == 2, "stop robot"
             if y > height_frame // 4:
                 if middle_x in range(0, left_range):

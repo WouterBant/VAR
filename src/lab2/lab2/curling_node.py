@@ -10,6 +10,7 @@ from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
+from playsound import playsound
 
 
 class CurlingNode(Node):
@@ -99,6 +100,7 @@ class CurlingNode(Node):
         if average_linear == 0:
             self.want_to_stop += 1
             if self.want_to_stop > 5:
+                playsound(r"C:\Users\woute\sound.wav")
                 assert 1 == 2
         else:
             self.want_to_stop = 0
