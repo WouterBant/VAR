@@ -41,8 +41,7 @@ Run with:
 ros2 run lab2 curling
 ```
 
-
-## Lab 3:
+## Lab 3: Mapping and Route Planning
 [Config file](configs/lab3/config.yaml)
 
 Build with:

@@ -3,7 +3,8 @@ import numpy as np
 
 
 class SfM:
-    def __init__(self, image_paths):  # TODO add config file
+    def __init__(self, config, image_paths):  # TODO add config file
+        self.config = config
         self.detector = cv2.SIFT_create()
         self.matcher = cv2.FlannBasedMatcher()
         self.image_paths = image_paths
