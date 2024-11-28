@@ -10,23 +10,21 @@ class SfM:
         self.image_paths = image_paths
 
     def detect_features(self):
-        self.keypoints = []
-        self.descriptors = []
-
+        keypoints = []
+        descriptors = []
         for image_path in self.image_paths:
             img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
             kp, des = self.detector.detectAndCompute(img, None)
-            self.keypoints.append(kp)
-            self.descriptors.append(des)
+            keypoints.append(kp)
+            descriptors.append(des)
+        return keypoints, descriptors
 
-        return self.keypoints, self.descriptors
-
-    def match_features(self):
-        self.matches = []
-        for i in range(len(self.descriptors) - 1):
+    def match_features(self, descriptors):
+        matches = []
+        for i in range(len(descriptors) - 1):
             # Match features between consecutive frames
             matches = self.matcher.knnMatch(
-                self.descriptors[i], self.descriptors[i + 1], k=2
+                descriptors[i], descriptors[i + 1], k=2
             )
 
             # Apply ratio test
@@ -35,9 +33,9 @@ class SfM:
                 if m.distance < 0.7 * n.distance:
                     good_matches.append(m)
 
-            self.matches.append(good_matches)
+            matches.append(good_matches)
 
-        return self.matches
+        return matches
 
     def estimate_camera_motion(self):
         camera_matrices = []

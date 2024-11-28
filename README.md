@@ -49,7 +49,7 @@ Build with:
 colcon build --packages-select lab3
 ```
 
-Run with:
+To capture a video:
 ```bash
-ros2 run lab3 my_node
+ros2 run lab3 video_node
 ```

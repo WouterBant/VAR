@@ -18,6 +18,9 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["my_node = lab3.my_node:main"],
+        "console_scripts": [
+            "my_node = lab3.my_node:main",
+            "video_node = lab3.video_node:main",
+        ],
     },
 )
