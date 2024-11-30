@@ -23,9 +23,7 @@ class SfM:
         matches = []
         for i in range(len(descriptors) - 1):
             # Match features between consecutive frames
-            matches = self.matcher.knnMatch(
-                descriptors[i], descriptors[i + 1], k=2
-            )
+            matches = self.matcher.knnMatch(descriptors[i], descriptors[i + 1], k=2)
 
             # Apply ratio test
             good_matches = []

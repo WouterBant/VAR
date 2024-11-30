@@ -8,6 +8,7 @@ import os
 import yaml
 from datetime import datetime
 
+
 class VideoNode(Node):
     def __init__(self):
         super().__init__("video_node")
@@ -72,11 +73,12 @@ class VideoNode(Node):
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
         filename = os.path.join(
-            self.output_directory, 
-            f"frame_{self.frame_number:06d}.{self.config.get('image_format', 'png')}"
+            self.output_directory,
+            f"frame_{self.frame_number:06d}.{self.config.get('image_format', 'png')}",
         )
-        cv2.imwrite(filename, cv_image)        
+        cv2.imwrite(filename, cv_image)
         self.frame_number += 1
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -88,6 +90,7 @@ def main(args=None):
     finally:
         node.destroy_node()
         rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()
