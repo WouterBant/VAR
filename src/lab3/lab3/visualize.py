@@ -35,6 +35,7 @@ def get_filter_option():
             return False
         print("Invalid choice. Please enter 'y' or 'n'.")
 
+
 def get_use_point_colors():
     """Prompt user about using point colors for sparse point cloud."""
     while True:
@@ -44,6 +45,7 @@ def get_use_point_colors():
         elif choice in ["n", "no"]:
             return False
         print("Invalid choice. Please enter 'y' or 'n'.")
+
 
 def get_interpolation_iterations():
     """Prompt user for number of interpolation iterations."""
@@ -57,6 +59,7 @@ def get_interpolation_iterations():
             print("Invalid choice. Please enter a non-negative integer.")
         except ValueError:
             print("Invalid choice. Please enter a non-negative integer.")
+
 
 def get_data_file():
     """Prompt user for data file path."""

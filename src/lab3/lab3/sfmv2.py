@@ -127,8 +127,8 @@ class SfMPipeline:
             3D points
         """
         # Homogeneous coordinates
-        pts1_homog = cv2.convertPointsToHomogeneous(pts1)
-        pts2_homog = cv2.convertPointsToHomogeneous(pts2)
+        # pts1_homog = cv2.convertPointsToHomogeneous(pts1)
+        # pts2_homog = cv2.convertPointsToHomogeneous(pts2)
 
         # Triangulation
         points_4d = cv2.triangulatePoints(P1, P2, pts1.T, pts2.T)

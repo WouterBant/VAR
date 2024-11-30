@@ -26,13 +26,13 @@ def create_2d_grid(points, radius=0.7, neighbor_threshold=120):
     # Filter points based on neighbor count
     filtered_points = point_coords[filtered_indices]
     if filtered_points.size > 0:
-        point_x, point_y, point_z = (
+        point_x, point_y, _ = (
             filtered_points[:, 0],
-            filtered_points[:, 2],
+            filtered_points[:, 2],  # NOTE the two here
             filtered_points[:, 1],
         )
     else:
-        point_x, point_y, point_z = [], [], []
+        point_x, point_y = [], []
 
     # Create 2D grid
     max_x, max_y = max(point_x), max(point_y)

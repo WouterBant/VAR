@@ -649,5 +649,5 @@ class StructureFromMotion:
         #     matches
         # )
 
-        print("[INFO] SfM pipeline completed.")
-        return refined_points_3d, refined_camera_poses
+        # print("[INFO] SfM pipeline completed.")
+        # return refined_points_3d, refined_camera_poses

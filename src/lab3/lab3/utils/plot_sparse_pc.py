@@ -59,7 +59,7 @@ def plot_sparse_point_cloud(
         )
     else:
         point_x, point_y, point_z = [], [], []
-    
+
     # Determine point colors
     if use_point_colors and all("rgb" in points[i] for i in filtered_indices):
         # Convert RGB values to color strings
@@ -78,7 +78,7 @@ def plot_sparse_point_cloud(
     for _ in range(interpolation_iterations):
         for i in filtered_indices:
             point = points[i]
-            neighbors = tree.query_ball_point(point["coordinates"], 3*radius)
+            neighbors = tree.query_ball_point(point["coordinates"], 3 * radius)
 
             # Calculate the average of neighboring point coordinates
             neighbor_coords = point_coords[neighbors]
@@ -87,7 +87,7 @@ def plot_sparse_point_cloud(
                 new_coord += np.random.normal(0, 0.05, 3)
 
             # Radius check: ensure the new point isn't too close to many existing points
-            if len(tree.query_ball_point(new_coord, 0.5*radius)) < 10:
+            if len(tree.query_ball_point(new_coord, 0.5 * radius)) < 10:
                 new_points.append(new_coord)
                 added_points += 1
                 if added_points % 300 == 0:
@@ -95,7 +95,7 @@ def plot_sparse_point_cloud(
 
                 if use_point_colors:
                     new_rgb = np.mean([points[j]["rgb"] for j in neighbors], axis=0)
-                    new_colors.append(f'rgb({new_rgb[0]},{new_rgb[1]},{new_rgb[2]})')
+                    new_colors.append(f"rgb({new_rgb[0]},{new_rgb[1]},{new_rgb[2]})")
 
     # Update points and colors
     if new_points:
