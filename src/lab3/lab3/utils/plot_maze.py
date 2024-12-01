@@ -3,7 +3,7 @@ from scipy.spatial import KDTree
 import matplotlib.pyplot as plt
 
 
-def create_2d_grid(points, radius=0.7, neighbor_threshold=120):
+def create_2d_grid(points, radius=0.7, neighbor_threshold=120, theta=-15, flip=True):
     """
     Creates a 2D grid representation of the maze from 3D points.
 
@@ -34,6 +34,12 @@ def create_2d_grid(points, radius=0.7, neighbor_threshold=120):
     else:
         point_x, point_y = [], []
 
+    # rotate everything by theta degrees
+    theta = np.radians(theta)
+    c, s = np.cos(theta), np.sin(theta)
+    R = np.array(((c, -s), (s, c)))
+    point_x, point_y = np.dot(R, np.array([point_x, point_y]))
+
     # Create 2D grid
     max_x, max_y = max(point_x), max(point_y)
     min_x, min_y = min(point_x), min(point_y)
@@ -44,6 +50,10 @@ def create_2d_grid(points, radius=0.7, neighbor_threshold=120):
     for x, y in zip(point_x, point_y):
         x, y = int((x - min_x) * factor), int((y - min_y) * factor)
         grid[x, y] = 1
+
+    if flip:
+        grid = np.flip(grid, axis=1)
+
     return grid
 
 

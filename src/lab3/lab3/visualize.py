@@ -84,9 +84,9 @@ def main():
     reader = get_data_file()
 
     # Define some predefined points
-    start = (130, 150)
-    intermediate = (75, 60)
-    end = (25, 175)
+    start = (140, 150)
+    intermediate = (100, 25)
+    end = (30, 175)
 
     # Get visualization type
     viz_type = get_visualization_type()
