@@ -1,1 +1,7 @@
 use_compressed_images: true
+save_images: true
+initial_x_location: 0.0
+initial_y_location: 0.0
+debug: 0.0
+look_ahead: 25
+max_angular_speed: 1.0

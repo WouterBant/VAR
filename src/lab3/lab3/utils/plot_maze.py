@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import KDTree
 import matplotlib.pyplot as plt
+from scipy.ndimage import median_filter
 
 
 def create_2d_grid(points, radius=0.7, neighbor_threshold=120, theta=-15, flip=True):
@@ -43,7 +44,7 @@ def create_2d_grid(points, radius=0.7, neighbor_threshold=120, theta=-15, flip=T
     # Create 2D grid
     max_x, max_y = max(point_x), max(point_y)
     min_x, min_y = min(point_x), min(point_y)
-    factor = 10
+    factor = 10  # TODO was 10
     grid = np.zeros(
         (int((max_x - min_x) * factor) + 1, int((max_y - min_y) * factor) + 1)
     )
@@ -53,6 +54,8 @@ def create_2d_grid(points, radius=0.7, neighbor_threshold=120, theta=-15, flip=T
 
     if flip:
         grid = np.flip(grid, axis=1)
+
+    grid = median_filter(grid, size=3)
 
     return grid
 

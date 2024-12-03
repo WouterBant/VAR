@@ -87,7 +87,7 @@ def plot_sparse_point_cloud(
                 new_coord += np.random.normal(0, 0.05, 3)
 
             # Radius check: ensure the new point isn't too close to many existing points
-            if len(tree.query_ball_point(new_coord, 0.5 * radius)) < 10:
+            if len(tree.query_ball_point(new_coord, 0.5 * radius)) < 20:
                 new_points.append(new_coord)
                 added_points += 1
                 if added_points % 300 == 0:

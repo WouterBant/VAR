@@ -3,13 +3,13 @@ from rclpy.node import Node
 import os
 import yaml
 from sensor_msgs.msg import CompressedImage, Image
-from control_msgs.msg import DynamicJointState
 from collections import deque as Deque
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge
+from .pipeline import PipeLine
 
 
-class CurlingNode(Node):
+class MazeNode(Node):
     def __init__(self):
         super().__init__("marker_detector_node")
 
@@ -29,12 +29,7 @@ class CurlingNode(Node):
                 10,
             )
 
-        self.joint_state_sub = self.create_subscription(
-            DynamicJointState,
-            "/dynamic_joint_states",
-            self.joint_state_callback,
-            10,
-        )
+        self.pipeline = PipeLine(config=self.config)
 
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 1)
         self.bridge = CvBridge()
@@ -59,11 +54,13 @@ class CurlingNode(Node):
             self.config = yaml.safe_load(file)
 
     def image_callback(self, msg):
-        pass
-        # np_arr = np.frombuffer(msg.data, np.uint8)
-        # cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        # Do something with the image and get an action
-        # self.queue.append(action)
+        if self.config.get("use_compressed_images"):
+            image = self.bridge.compressed_imgmsg_to_cv2(msg)
+        else:
+            image = self.bridge.imgmsg_to_cv2(msg)
+        self.marker_detection.detect(image)
+        cmd = self.pipeline(image)
+        self.queue.append(cmd)
 
     def timer_callback(self):
         if len(self.queue) == 0:
@@ -80,7 +77,7 @@ class CurlingNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = CurlingNode()
+    node = MazeNode()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
