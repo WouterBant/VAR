@@ -82,6 +82,10 @@ def plot_path(grid, path, name="Dijkstra"):
     :param grid: 2D NumPy array representing the maze.
     :param path: List of coordinates representing the shortest path.
     """
+    # save path as a list of tuples
+    path = [(int(p[0]), int(p[1])) for p in path]
+    np.save(f"{name}_path.npy", path)
+
     # Create a plot
     plt.figure(figsize=(10, 10))
     plt.imshow(grid, cmap="Greys", origin="lower")  # Maze in black and white

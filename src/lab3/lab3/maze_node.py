@@ -58,7 +58,6 @@ class MazeNode(Node):
             image = self.bridge.compressed_imgmsg_to_cv2(msg)
         else:
             image = self.bridge.imgmsg_to_cv2(msg)
-        self.marker_detection.detect(image)
         cmd = self.pipeline(image)
         self.queue.append(cmd)
 

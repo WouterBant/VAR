@@ -151,13 +151,13 @@ class MarkerDetection:
             plt.imshow(rgb_frame)
             plt.show()
         else:
-            pass
-            # cv2.imshow("Frame", frame)
-            # key = cv2.waitKey(1) & 0xFF
-            # if key == ord("q"):
-            #     cv2.destroyAllWindows()
+            # pass
+            cv2.imshow("Frame", frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord("q"):
+                cv2.destroyAllWindows() 
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+            
         return {
             "corners": all_corners,
             "marker_ids": all_marker_ids,

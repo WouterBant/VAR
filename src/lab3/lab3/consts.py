@@ -1,5 +1,7 @@
 from typing import List, Dict, Any
 from dataclasses import dataclass
+import numpy as np
+import os
 import cv2
 
 ARUCO_DICT = {
@@ -15,36 +17,95 @@ ARUCO_DICT = {
 GRASS_OFFSET = 1.8
 ROBOT_CAMERA_OFFSET = 2
 
-PATH = []
+path_path = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+    "..",
+    "..",
+    "..",
+    "..",
+    "assets",
+    "dijkstra_wall_avoidance_path.npy",
+)
+PATH = np.load(path_path)*2
+print(PATH)
 
-# TODO check this again
+
+X_OFFSET = 20
+Y_OFFSET = 10
 POSITIONS: List[Dict[str, Any]] = [
-    {"height": 23.5, "code": "36h11-16", "z": 106.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -281, "x": -502, "ids": [16]},
-    {"height": 8, "code": "36h11-19", "z": 51.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -184, "x": -502, "ids": [3, 151, 19]},
-    {"height": 20.5, "code": "7x7-37", "z": 98.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -95.5, "x": -502, "ids": [37, 95]},
-    {"height": 8, "code": "36h11-29", "z": 50.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 9.5, "x": -502, "ids": [29]},
-    {"height": 27.5, "code": "36h11-8", "z": 104.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 9.5, "x": -502, "ids": [8]},
-    {"height": 20.5, "code": "7x7-27", "z": 99.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 295, "x": -502, "ids": [1, 27, 60, 108, 574]},
-    {"height": 23.5, "code": "36h11-36", "z": 106.9-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 394, "x": -502, "ids": [36]},
-    {"height": 8, "code": "36h11-59", "z": 51-ROBOT_CAMERA_OFFSET, "y": 186.5, "x": -313, "ids": [14, 59]},  # gras
-    {"height": 8, "code": "36h11-89", "z": 46-ROBOT_CAMERA_OFFSET, "y": 445.9, "x": -78, "ids": [89]},	#gras
-    {"height": 8, "code": "36h11-99", "z": 49.5-ROBOT_CAMERA_OFFSET, "y": 445.9, "x": 80, "ids": [99]},	#gras
-    {"height": 8, "code": "36h11-69", "z": 47-ROBOT_CAMERA_OFFSET, "y": 183.2, "x": 364.6, "ids": [69, 111]},	#gras
-    {"height": 8, "code": "36h11-79", "z": 49.3-ROBOT_CAMERA_OFFSET, "y": 454.4, "x": 408.5, "ids": [79]},	#gras
-    {"height": 23.5, "code": "36h11-26", "z": 103.8-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 395, "x": 421.5, "ids": [26, 120]}, #maybe add 181
-    {"height": 20.5, "code": "36h12-67", "z": 95.4-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 318, "x": 421.5, "ids": [67, 439]},
-    {"height": 27.5, "code": "36h11-18", "z": 98.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -5.3, "x": 421.5, "ids": [18, 129]},
-    {"height": 20.5, "code": "36h12-47", "z": 96.3-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -97, "x": 421.5, "ids": [47]},
-    {"height": 8, "code": "36h11-9", "z": 47.8-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -176.6, "x": 408.5, "ids": [9, 112]},
-    {"height": 23.5, "code": "36h11-66", "z": 106.4-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -295.5, "x": 421.5, "ids": [66]},
-    # {"height": 8, "code": "36h11-39", "z": 49.2-ROBOT_CAMERA_OFFSET, "y": -446.4, "x": 80, "ids": [39]},  # gras
-    # {"height": 8, "code": "36h11-49", "z": 49.5-ROBOT_CAMERA_OFFSET, "y": -445.2, "x": -78, "ids": [49, 213]},  # gras
-    {"height": 20.5, "code": "36h12-57", "z": 100-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [57]},	
-    # {"height": 23.5, "code": "36h11-46", "z": 165.6-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": -534.5, "x": 0, "ids": [46]},
-    {"height": 20.5, "code": "7x7-7", "z": 97.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 553.2, "x": -48, "ids": [7]},	
-    {"height": 23, "code": "36h11-56", "z": 164-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 553.2, "x": -48, "ids": [4, 56]},
-    {"height": 23, "code": "36h11-25", "z": 104-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 560, "x": 127.5, "ids": [25]},
-    {"height": 23, "code": "36h11-35", "z": 97.5-ROBOT_CAMERA_OFFSET-GRASS_OFFSET, "y": 576.2, "x": -201.5, "ids": [35]},
+    {"height": 8, "z": 5, "y": 7, "x": 0.0, "ids": [67]},
+    {"height": 8, "z": 5, "y": 31, "x": 0.0, "ids": [57]},
+    {"height": 8, "z": 5, "y": 53, "x": 0.0, "ids": [64]},
+    {"height": 8, "z": 5, "y": 95, "x": 0.0, "ids": [65]},
+    {"height": 8, "z": 5, "y": 115, "x": 0.0, "ids": [71]},
+    {"height": 8, "z": 5, "y": 140, "x": 0.0, "ids": [72]},
+    {"height": 8, "z": 5, "y": 179, "x": 0.0, "ids": [73]},
+    {"height": 8, "z": 5, "y": 210, "x": 0.0, "ids": [69]},
+    {"height": 8, "z": 5, "y": 240, "x": 0.0, "ids": [33]},
+    {"height": 8, "z": 5, "y": 267, "x": 0.0, "ids": [42]},
+    {"height": 8, "z": 5, "y": 293, "x": 0.0, "ids": [30]},
+    {"height": 8, "z": 5, "y": 327, "x": 0.0, "ids": [20]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 12, "ids": [66]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 44, "ids": [68]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 74, "ids": [63]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 95, "ids": [38]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 127, "ids": [18]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 158, "ids": [58]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 176, "ids": [41]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 204, "ids": [0]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 216, "ids": [16]},
+    {"height": 8, "z": 5, "y": 0.0, "x": 248, "ids": [11]},
+    {"height": 8, "z": 5, "y": 20, "x": 255, "ids": [2]},
+    {"height": 8, "z": 5, "y": 44, "x": 255, "ids": [13]},
+    {"height": 8, "z": 5, "y": 73, "x": 255, "ids": [15]},
+    {"height": 8, "z": 10.5, "y": 98, "x": 255, "ids": [4]},
+    {"height": 8, "z": 10.5, "y": 112, "x": 255, "ids": [17]},
+    {"height": 8, "z": 10.5, "y": 155, "x": 255, "ids": [5]},
+    {"height": 8, "z": 5, "y": 173, "x": 255, "ids": [7]},
+    {"height": 8, "z": 5, "y": 208, "x": 255, "ids": [6]},
+    {"height": 8, "z": 5, "y": 238, "x": 255, "ids": [3]},
+    {"height": 8, "z": 5, "y": 340, "x": 92, "ids": [76]},
+    {"height": 8, "z": 5, "y": 340, "x": 119, "ids": [36]},
+    {"height": 8, "z": 5, "y": 340, "x": 135, "ids": [45]},
+    {"height": 8, "z": 5, "y": 340, "x": 155, "ids": [35]},
+    {"height": 8, "z": 5, "y": 340, "x": 176, "ids": [46]},
+    {"height": 8, "z": 5, "y": 340, "x": 202, "ids": [44]},
+    {"height": 8, "z": 5, "y": 340, "x": 239, "ids": [43]},
+    {"height": 8, "z": 5, "y": 7, "x": 85, "ids": [61]},
+    {"height": 8, "z": 5, "y": 31, "x": 85, "ids": [62]},
+    {"height": 8, "z": 5, "y": 53, "x": 85, "ids": [59]},
+    {"height": 8, "z": 5, "y": 7, "x": 85, "ids": [39]},
+    {"height": 8, "z": 5, "y": 31, "x": 85, "ids": [23]},
+    {"height": 8, "z": 5, "y": 53, "x": 85, "ids": [40]},
+    {"height": 8, "z": 5, "y": 179, "x": 85, "ids": [74]},
+    {"height": 8, "z": 5, "y": 210, "x": 85, "ids": [75]},
+    {"height": 8, "z": 5, "y": 240, "x": 85, "ids": [56]},
+    {"height": 8, "z": 5, "y": 267, "x": 85, "ids": [32]},
+    {"height": 8, "z": 5, "y": 293, "x": 85, "ids": [34]},
+    {"height": 8, "z": 5, "y": 327, "x": 85, "ids": [25]},
+    {"height": 8, "z": 5, "y": 180, "x": 85, "ids": [9]},
+    {"height": 8, "z": 5, "y": 205, "x": 85, "ids": [19]},
+    {"height": 8, "z": 5, "y": 219, "x": 85, "ids": [48]},
+    {"height": 8, "z": 5, "y": 265, "x": 85, "ids": [52]},
+    {"height": 8, "z": 5, "y": 296, "x": 85, "ids": [50]},
+    {"height": 8, "z": 5, "y": 328, "x": 85, "ids": [51]},
+    {"height": 8, "z": 5, "y": 170, "x": 95, "ids": [26]},
+    {"height": 8, "z": 5, "y": 170, "x": 127, "ids": [27]},
+    {"height": 8, "z": 5, "y": 170, "x": 161, "ids": [60]},
+    {"height": 8, "z": 5, "y": 170, "x": 95, "ids": [14]},
+    {"height": 8, "z": 5, "y": 170, "x": 140, "ids": [10]},
+    {"height": 8, "z": 5, "y": 170, "x": 160, "ids": [21]},
+    {"height": 8, "z": 5, "y": 153, "x": 170, "ids": [22]},
+    {"height": 8, "z": 5, "y": 124, "x": 170, "ids": [29]},
+    {"height": 8, "z": 5, "y": 92, "x": 170, "ids": [31]},
+    {"height": 8, "z": 5, "y": 93, "x": 170, "ids": [47]},
+    {"height": 8, "z": 5, "y": 116, "x": 170, "ids": [55]},
+    {"height": 8, "z": 5, "y": 131, "x": 170, "ids": [28]},
+    {"height": 8, "z": 5, "y": 160, "x": 170, "ids": [24]},
+    {"height": 8, "z": 5, "y": 255, "x": 244, "ids": [53]},
+    {"height": 8, "z": 5, "y": 255, "x": 204, "ids": [37]},
+    {"height": 8, "z": 5, "y": 255, "x": 177, "ids": [54]},
 ]
 
 @dataclass
@@ -61,8 +122,8 @@ for pos in POSITIONS:
             raise ValueError(f"Duplicate marker id: {marker_id}")
         MARKER_ID_2_LOCATION[marker_id] = MarkerInfo(
             height=pos["height"],
-            x=pos["x"],
-            y=pos["y"],
+            x=pos["x"] + X_OFFSET,
+            y=pos["y"] + Y_OFFSET,
             z=pos["z"],
         )
 

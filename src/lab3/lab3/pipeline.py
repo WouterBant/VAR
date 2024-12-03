@@ -5,6 +5,7 @@ import textwrap
 from .movement_contoller import MovementController
 from .marker_detection import MarkerDetection
 from .localization import Localization
+from geometry_msgs.msg import Twist
 
 
 class PipeLine:
@@ -26,7 +27,6 @@ class PipeLine:
                 f"marker_images/{self.frame_nmbr}.jpg",
                 cv2.cvtColor(frame, cv2.COLOR_RGB2BGR),
             )
-
         cmd = self.movement_controller.move_to_target(location_t, pose_t)
         if self.config.get("save_images"):
             self.save_movement_image(marker_detection_results["frame"], cmd, pose_t)

@@ -11,15 +11,21 @@ class MovementController:
 
     def get_target_location(self, current_pos):
         distance = float("inf")
+        index = -1
         for idx, location in enumerate(PATH):
+            # TODOs
             dx = location[0] - current_pos[0]
             dy = location[1] - current_pos[1]
             new_distance = math.sqrt(dx * dx + dy * dy)
-            if new_distance > distance:
-                if idx + self.config.get("look_ahead") < len(PATH):
-                    return PATH[idx + self.config.get("look_ahead")]
-                assert 1 == 2, "Arrived at the target location (1/2)"
-            distance = new_distance
+            if new_distance < distance:
+                distance = new_distance
+                index = idx
+
+        if index + self.config.get("look_ahead") < len(PATH):
+            print(f"Length path: {len(PATH)}")
+            print(f"Index: {index}")
+            return PATH[index + self.config.get("look_ahead")]
+        
         assert 1 == 2, "Arrived at the target location (2/2)"
 
     def move_to_target(self, current_pos, pose):
@@ -34,6 +40,8 @@ class MovementController:
         dx = target_location[0] - current_pos[0]
         dy = target_location[1] - current_pos[1]
 
+        print(f"Current Location: {current_pos}, Target Location: {target_location}")
+
         distance = math.sqrt(dx * dx + dy * dy)
         target_angle = np.degrees(math.atan2(dy, -dx))
         use_angle = pose - target_angle  # TODO check this
@@ -44,7 +52,7 @@ class MovementController:
             print(f"Use angle: {use_angle}")
 
         # Normal operation with cautious checking
-        cmd = self._normal_movement(distance, use_angle)
+        cmd = self._normal_movement(use_angle)
         return cmd
 
     def _normal_movement(self, target_angle: float) -> Twist:
