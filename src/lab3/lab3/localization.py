@@ -33,7 +33,18 @@ class Localization:
         if len(poses) == 0:
             return None, None
 
-        average_pose = sum(poses) / len(poses)
+        pos_poses = []
+        neg_poses = []
+        for i in poses:
+            if i > 0:
+                pos_poses.append(i)
+            else:
+                neg_poses.append(i)
+        if len(pos_poses) >= len(neg_poses):
+            average_pose = sum(pos_poses) / len(pos_poses)
+        else:
+            average_pose = sum(neg_poses) / len(neg_poses)
+        # average_pose = sum(poses) / len(poses)  TODO changed this
         self.previous_location = position
         if self.weighted_location is None:
             self.weighted_location = position
@@ -74,9 +85,6 @@ class Localization:
             ]
         )
 
-        print(landmarks, "l")
-        print(distances, "d")
-
         result = least_squares(
             residuals,
             initial_guess,
@@ -86,7 +94,7 @@ class Localization:
             gtol=1e-10,
         )
 
-        if abs(result.x[0]) > 300 or abs(result.x[1]) > 450:
+        if abs(result.x[0]) > 425 or abs(result.x[1]) > 450:
             return self.previous_location
 
         return result.x
@@ -269,7 +277,7 @@ class Localization:
             dist2 = np.linalg.norm(point2 - self.previous_location)
             result = point1 if dist1 < dist2 else point2
 
-        if abs(result[0]) > 300 or abs(result[1]) > 450:
+        if abs(result[0]) > 425 or abs(result[1]) > 450:
             return self.previous_location
 
         return result

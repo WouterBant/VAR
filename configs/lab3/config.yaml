@@ -1,8 +1,14 @@
-use_compressed_images: true
+use_compressed_images: false
 save_images: true
-initial_x_location: 400
-initial_y_location: 400
+initial_x_location: 250
+initial_y_location: 300
 debug: 0.0
-look_ahead: 10
-max_angular_speed: 1.0
-angular_kp: 0.3
+look_ahead: 15
+max_angular_speed: 1.5
+angular_kp: 0.05
+online_path: true
+final_x_location: 0  # 0, 424
+final_y_location: 380   # 380, 40 or 50
+# gekke hoek: 250, 300
+# begin hoek: 50, 200
+# tussen platen einde: 430, 200

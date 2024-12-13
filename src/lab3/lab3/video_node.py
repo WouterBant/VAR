@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 import os
 import yaml
 from datetime import datetime
-
+import matplotlib.pyplot as plt
 
 class VideoNode(Node):
     def __init__(self):
@@ -70,11 +70,12 @@ class VideoNode(Node):
             np_arr = np.frombuffer(msg.data, np.uint8)
             cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         else:
+            print("got image")
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
         filename = os.path.join(
             self.output_directory,
-            f"frame_{self.frame_number:06d}.{self.config.get('image_format', 'png')}",
+            f"frame_{self.frame_number:06d}.{self.config.get('image_format', 'jpg')}",
         )
         cv2.imwrite(filename, cv_image)
         self.frame_number += 1

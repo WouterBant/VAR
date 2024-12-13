@@ -22,8 +22,8 @@ def compute_camera_positions(cameras):
 def plot_sparse_point_cloud(
     points,
     cameras,
-    neighbor_threshold=120,
-    radius=0.7,
+    neighbor_threshold=100,
+    radius=4.7,
     use_point_colors=False,
     interpolation_iterations=0,
 ):
@@ -143,9 +143,9 @@ def plot_sparse_point_cloud(
     fig = go.Figure(data=[points_trace, cameras_trace])
     fig.update_layout(
         scene=dict(
-            xaxis=dict(title="X", range=[-20, 20]),  # Fixed X-axis range
-            yaxis=dict(title="Y", range=[-20, 20]),  # Fixed Y-axis range
-            zaxis=dict(title="Z", range=[-20, 20]),  # Fixed Z-axis range
+            xaxis=dict(title="X"),  # Fixed X-axis range
+            yaxis=dict(title="Y"),  # Fixed Y-axis range
+            zaxis=dict(title="Z"),  # Fixed Z-axis range
         ),
         title="Filtered Sparse Point Cloud and Camera Locations",
         legend=dict(x=0.8, y=0.9),
