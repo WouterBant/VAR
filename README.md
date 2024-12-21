@@ -53,3 +53,8 @@ To capture a video:
 ```bash
 ros2 run lab3 video_node
 ```
+
+To drive out of the maze:
+```bash
+ros2 run lab3 maze_node
+```
