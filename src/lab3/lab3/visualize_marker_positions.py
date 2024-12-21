@@ -1,12 +1,11 @@
 import plotly.graph_objects as go
-import numpy as np
 from consts import POSITIONS, PATH
 
 
 def show():
     # Convert positions to arrays for plotting
     positions = POSITIONS  # Using the provided POSITIONS list
-    x_coords = [(420-p["x"]) / 100 for p in positions]  # Convert mm to meters
+    x_coords = [(420 - p["x"]) / 100 for p in positions]  # Convert mm to meters
     y_coords = [p["y"] / 100 for p in positions]
     z_coords = [p["z"] / 100 for p in positions]
     labels = [
@@ -57,7 +56,7 @@ def show():
             name="Path",
             line=dict(color="blue", width=3),
         )
-    )   
+    )
 
     # Show the plot
     fig.show()

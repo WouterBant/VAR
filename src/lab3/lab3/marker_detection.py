@@ -60,9 +60,9 @@ class MarkerDetection:
             K = (
                 np.array(
                     [
-                        [286.28527,   0.     , 323.62102],
-                        [0.     , 285.83978, 200.52749],
-                        [0.     ,   0.     ,   1.     ],
+                        [286.28527, 0.0, 323.62102],
+                        [0.0, 285.83978, 200.52749],
+                        [0.0, 0.0, 1.0],
                     ]
                 )
                 * resize_factor
@@ -77,7 +77,16 @@ class MarkerDetection:
                         marker_size,
                         K,
                         np.array(
-                            [0.504856, -0.113855, 0.000454, -0.000873, -0.009483, 0.845664, -0.043607, -0.040976],
+                            [
+                                0.504856,
+                                -0.113855,
+                                0.000454,
+                                -0.000873,
+                                -0.009483,
+                                0.845664,
+                                -0.043607,
+                                -0.040976,
+                            ],
                         ),
                     )
 
@@ -149,9 +158,9 @@ class MarkerDetection:
             cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
-                cv2.destroyAllWindows() 
+                cv2.destroyAllWindows()
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            
+
         return {
             "corners": all_corners,
             "marker_ids": all_marker_ids,

@@ -49,9 +49,7 @@ class Localization:
         if self.weighted_location is None:
             self.weighted_location = position
         else:
-            self.weighted_location = (
-                self.weighted_location * 0.8 + position * 0.2
-            )
+            self.weighted_location = self.weighted_location * 0.8 + position * 0.2
         self.previous_pose = average_pose
         return self.weighted_location, average_pose
 
@@ -62,8 +60,10 @@ class Localization:
         def residuals(camera_position_2d, landmarks, distances):
             camera_position = np.array([camera_position_2d[0], camera_position_2d[1]])
             estimated_distances = np.linalg.norm(landmarks - camera_position, axis=1)
-            distance_to_previous = np.linalg.norm(camera_position_2d - self.previous_location)
-            return estimated_distances - distances + 0.5*distance_to_previous
+            distance_to_previous = np.linalg.norm(
+                camera_position_2d - self.previous_location
+            )
+            return estimated_distances - distances + 0.5 * distance_to_previous
 
         initial_guess = self.previous_location
 

@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 import os
 import yaml
 from datetime import datetime
-import matplotlib.pyplot as plt
+
 
 class VideoNode(Node):
     def __init__(self):

@@ -2,9 +2,9 @@ from geometry_msgs.msg import Twist
 import math
 import numpy as np
 from .consts import PATH, GRID
-import matplotlib.pyplot as plt
 from .route_planning import RoutePlanning
 from .utils.plot_maze import plot_path
+
 
 class MovementController:
     def __init__(self, config):
@@ -14,7 +14,10 @@ class MovementController:
         plot_path(GRID, self.path, name="Dijkstra")
 
     def get_path(self):
-        start = (self.config.get("initial_x_location"), self.config.get("initial_y_location"))
+        start = (
+            self.config.get("initial_x_location"),
+            self.config.get("initial_y_location"),
+        )
         end = (self.config.get("final_x_location"), self.config.get("final_y_location"))
         path = RoutePlanning.dijkstra_with_wall_distance(
             GRID, start, end, wall_weight=150.0
@@ -37,7 +40,7 @@ class MovementController:
             print(f"Length path: {len(self.path)}")
             print(f"Index: {index}")
             return self.path[index + self.config.get("look_ahead")]
-        
+
         assert 1 == 2, "Arrived at the target location (2/2)"
 
     def move_to_target(self, current_pos, pose):
@@ -46,17 +49,13 @@ class MovementController:
             cmd.linear.x = 0.1
             cmd.angular.z = 0.0
             return cmd
-    
+
         target_location = self.get_target_location(current_pos)
 
         dx = target_location[0] - current_pos[0]
         dy = target_location[1] - current_pos[1]
 
-        print(f"Current Location: {current_pos}, Target Location: {target_location}")
-        print(f"current pose: {pose}")
-        distance = math.sqrt(dx * dx + dy * dy)
         target_angle = np.degrees(math.atan2(dy, -dx))
-        print(f"Target angle: {target_angle}")
         use_angle = pose - target_angle  # TODO check this
 
         if self.config["debug"] > 6:
@@ -81,7 +80,6 @@ class MovementController:
         cmd.angular.z = max(
             min(cmd.angular.z, self.max_angular_speed), -self.max_angular_speed
         )
-        print(f"Linear: {cmd.linear.x}, Angular: {cmd.angular.z}")
         return cmd
 
     def _get_angular_velocity(self, angle_diff):
